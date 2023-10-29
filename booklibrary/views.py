@@ -4,6 +4,7 @@ from django.shortcuts import redirect
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 
 from books.models import Books
 from booklibrary.models import UserBook
@@ -11,15 +12,27 @@ from booklibrary.models import UserBook
 # Create your views here.
 # MAIN PAGE
 def show_library(request):
-    books = Books.objects.all()
-    # userstatus = UserBook.objects.filter(user=request.user, status = 'not_started')
+    return render(request, 'library.html')
 
-    context = {
-        'books' : books,
-        # 'userstatus' : userstatus
-    }
+@csrf_exempt
+def load_books_ajax(request):
+    if request.method == 'POST':
+        search_query = request.POST.get('search_query')  # Ambil kata kunci pencarian dari permintaan POST
 
-    return render(request, 'library.html', context)
+        # Ambil buku dari basis data
+        if search_query:
+            books = Books.objects.filter(Q(title__icontains=search_query) | Q(isbn10__icontains=search_query) | Q(isbn13__icontains=search_query))
+        else:
+            books = Books.objects.all()
+
+        # Serialisasi data buku ke dalam format JSON
+        serialized_books = serializers.serialize('json', books)
+
+        # Kirim data buku sebagai respons JSON
+        return JsonResponse({'status': 'success', 'books': serialized_books})
+
+    # Jika metode permintaan tidak valid
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
 
 # SHOW USER'S BOOKSHELF
 @login_required

@@ -1,0 +1,394 @@
+{% extends "layout.html" %} {% load static %} {% block head %}
+<link rel="stylesheet" href="{% static 'homepage_static/css/styles.css' %}" />
+<link
+  rel="stylesheet"
+  href="{% static 'booklibrary_static/css/styles.css' %}"
+/>
+
+<!--Icon-->
+<link href="{% static 'icons/icons8-book-shelf-64.png' %}" rel="icon" />
+{% endblock %} {% block title %} Books {% endblock %} {% block body %}
+
+<ul class="nav nav-tabs">
+  <li class="nav-item">
+    <a class="nav-link active" data-toggle="tab" href="#booksTab">Books</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" data-toggle="tab" href="#favoritesTab">Favorites</a>
+  </li>
+</ul>
+<div class="tab-content">
+  <!-- Konten untuk tab buku -->
+  <div id="booksTab" class="tab-pane fade show active">
+    <!-- Konten buku yang dimuat melalui AJAX akan ditampilkan di sini -->
+    <form id="search_book" class="container">
+      <div class="input-group">
+        <input
+          type="text"
+          id="search_bar"
+          name="search_bar"
+          class="form-control"
+          placeholder="Search book by title or isbn10 or isbn13 ..."
+        />
+        <button class="btn btn-dark" type="submit">Search</button>
+      </div>
+    </form>
+    <div class="container" id="books"></div>
+  </div>
+  <!-- Konten untuk tab favorit -->
+  <div id="favoritesTab" class="tab-pane fade">
+    <!-- Konten buku yang telah difavoritkan akan ditampilkan di sini -->
+    <div class="container" id="fav-books"></div>
+  </div>
+</div>
+
+<!-- BOOK'S MODAL -->
+<div
+  class="modal fade"
+  id="bookDetailsModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-scrollable" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalBookTitle">Book Title</h5>
+        <button
+          type="button"
+          class="close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Book details go here -->
+        <img id="modalBookThumbnail" src="" alt="Book Thumbnail" />
+        <br />
+        <h6><b>Description:</b></h6>
+        <p id="modalBookDescription"></p>
+        <p class="no-margin">
+          <b><span id="modalBookGenreYear"></span></b>
+        </p>
+        <p class="no-margin">
+          <b>Author :</b> <span id="modalBookAuthor"></span>
+        </p>
+        <p class="no-margin">
+          <b>Pages :</b> <span id="modalBookPages"></span>
+        </p>
+        <p class="no-margin">
+          <b>Rating :</b> <span id="modalBookAvgRate"></span>/5
+        </p>
+        <p class="no-margin">
+          <b>Total Reviewer :</b> <span id="modalBookCountRate"></span>
+        </p>
+        <p class="no-margin">
+          <b>ISBN-10 :</b> <span id="modalBookIsbn10"></span>
+        </p>
+        <p class="no-margin">
+          <b>ISBN-13 :</b> <span id="modalBookIsbn13"></span>
+        </p>
+      </div>
+      <div class="card-footer">
+        <a id="reviewButton" href="#" class="btn btn-success">Review Book</a>
+        <a id="favButton" href="#" class="btn btn-warning">Add to Favorite</a>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Fav Book Modal -->
+<div
+  class="modal fade"
+  id="favbookDetailsModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-scrollable" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalFavBookTitle">Book Title</h5>
+        <button
+          type="button"
+          class="close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Book details go here -->
+        <img id="modalFavBookThumbnail" src="" alt="Book Thumbnail" />
+        <br />
+        <h6><b>Description:</b></h6>
+        <p id="modalFavBookDescription"></p>
+        <p class="no-margin">
+          <b><span id="modalFavBookGenreYear"></span></b>
+        </p>
+        <p class="no-margin">
+          <b>Author :</b> <span id="modalFavBookAuthor"></span>
+        </p>
+        <p class="no-margin">
+          <b>Pages :</b> <span id="modalFavBookPages"></span>
+        </p>
+        <p class="no-margin">
+          <b>Rating :</b> <span id="modalFavBookAvgRate"></span>/5
+        </p>
+        <p class="no-margin">
+          <b>Total Reviewer :</b> <span id="modalFavBookCountRate"></span>
+        </p>
+        <p class="no-margin">
+          <b>ISBN-10 :</b> <span id="modalFavBookIsbn10"></span>
+        </p>
+        <p class="no-margin">
+          <b>ISBN-13 :</b> <span id="modalFavBookIsbn13"></span>
+        </p>
+      </div>
+      <div class="card-footer">
+        <a id="favreviewButton" href="#" class="btn btn-success">Review Book</a>
+        <a id="remfavButton" href="#" class="btn btn-outline-danger"
+          >Remove from Favorite</a
+        >
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block js_page %}
+<script>
+  let searchQuery = "";
+
+  $(document).ready(function () {
+    loadBooks(searchQuery);
+
+    $("#books").on("click", ".card-link", function () {
+      const bookId = $(this).data("book-id");
+      const title = $(this).data("title");
+      const author = $(this).data("author");
+      const year = $(this).data("year");
+      const genre = $(this).data("genre");
+      const pages = $(this).data("pages");
+      const description = $(this).data("description");
+      const thumbnail = $(this).data("thumbnail");
+      const ratings_avg = $(this).data("ratings_avg");
+      const ratings_count = $(this).data("ratings_count");
+      const isbn10 = $(this).data("isbn10");
+      const isbn13 = $(this).data("isbn13");
+      const reviewUrl = $(this).data("review-url");
+
+      // Now populate the modal with these values
+      $("#modalBookTitle").text(title);
+      $("#modalBookThumbnail").attr("src", thumbnail);
+      $("#modalBookGenreYear").text(genre + " | " + year);
+      $("#modalBookAuthor").text(author);
+      $("#modalBookPages").text(pages);
+      $("#modalBookDescription").text(description);
+      $("#modalBookAvgRate").text(ratings_avg);
+      $("#modalBookCountRate").text(ratings_count);
+      $("#modalBookIsbn10").text(isbn10);
+      $("#modalBookIsbn13").text(isbn13);
+
+      $("#reviewButton").attr("href", reviewUrl);
+      $("#favButton").data("book-id", bookId);
+
+      // Finally, display the modal
+      $("#bookDetailsModal").modal("show");
+    });
+
+    $("#fav-books").on("click", ".card-link", function () {
+      const bookId = $(this).data("book-id");
+      const title = $(this).data("title");
+      const author = $(this).data("author");
+      const year = $(this).data("year");
+      const genre = $(this).data("genre");
+      const pages = $(this).data("pages");
+      const description = $(this).data("description");
+      const thumbnail = $(this).data("thumbnail");
+      const ratings_avg = $(this).data("ratings_avg");
+      const ratings_count = $(this).data("ratings_count");
+      const isbn10 = $(this).data("isbn10");
+      const isbn13 = $(this).data("isbn13");
+      const reviewUrl = $(this).data("review-url");
+
+      // Now populate the modal with these values
+      $("#modalFavBookTitle").text(title);
+      $("#modalFavBookThumbnail").attr("src", thumbnail);
+      $("#modalFavBookGenreYear").text(genre + " | " + year);
+      $("#modalFavBookAuthor").text(author);
+      $("#modalFavBookPages").text(pages);
+      $("#modalFavBookDescription").text(description);
+      $("#modalFavBookAvgRate").text(ratings_avg);
+      $("#modalFavBookCountRate").text(ratings_count);
+      $("#modalFavBookIsbn10").text(isbn10);
+      $("#modalFavBookIsbn13").text(isbn13);
+
+      $("#favreviewButton").attr("href", reviewUrl);
+      $("#remfavButton").data("book-id", bookId);
+
+      // Finally, display the modal
+      $("#favbookDetailsModal").modal("show");
+    });
+
+    $('[data-toggle="tab"]').on("shown.bs.tab", (event) => {
+      if (event.target.textContent === "Favorites") load_favorites();
+    });
+
+    // Event ketika tombol "Add to Favorite" pada modal buku ditampilkan
+    $("#bookDetailsModal").on("shown.bs.modal", function () {
+      $("#favButton").click(function () {
+        const bookId = $(this).data("book-id");
+        addFavorite(bookId);
+        $("#bookDetailsModal").modal("hide");
+      });
+    });
+
+    // Event ketika tombol "Remove from Favorite" pada modal buku favorit ditampilkan
+    $("#favbookDetailsModal").on("shown.bs.modal", function () {
+      $("#remfavButton").click(function () {
+        const bookId = $(this).data("book-id");
+        removeFavorite(bookId);
+        $("#favbookDetailsModal").modal("hide");
+      });
+    });
+  });
+
+  // Tangkap event submit form pencarian
+  $("#search_book").submit(function (event) {
+    event.preventDefault(); // Hindari form dari proses submit bawaan browser
+
+    searchQuery = $("#search_bar").val(); // Ambil nilai dari input pencarian
+
+    // Kirim permintaan Ajax dengan kata kunci pencarian dan nomor halaman
+    loadBooks(searchQuery);
+  });
+
+  function loadBooks(searchQuery) {
+    $.ajax({
+      type: "POST",
+      url: "{% url 'bookreview:load_books' %}",
+      data: {
+        search_query: searchQuery,
+      },
+      success: function (response) {
+        if (response.status === "success") {
+          // Update daftar buku di antarmuka pengguna dengan data yang diterima
+          const booksContainer = $("#books");
+          booksContainer.empty(); // Kosongkan daftar buku sebelum memasukkan buku yang baru dimuat
+          $.each(JSON.parse(response.books), function (index, book) {
+            // Tambahkan buku ke daftar buku
+            booksContainer.append(`<a
+            href="#"
+            class="card-link"
+            data-book-id="${book.pk}"
+            data-title="${book.fields.title}"
+            data-author="${book.fields.author}"
+            data-year="${book.fields.published_year}"
+            data-genre="${book.fields.genre}"
+            data-pages="${book.fields.pages}"
+            data-description="${book.fields.description}"
+            data-thumbnail="${book.fields.thumbnail}"
+            data-ratings_avg="${book.fields.ratings_avg}"
+            data-ratings_count="${book.fields.ratings_count}"
+            data-isbn10="${book.fields.isbn10}"
+            data-isbn13="${book.fields.isbn13}"
+            data-review-url="book/${book.fields.isbn13}/review/"
+          >
+            <div class="card item" data-book-id="${book.pk}">
+              <img src="${book.fields.thumbnail}" class="card-img-top" alt="a book" />
+              <div class="card-body">
+                <h5 class="card-title" id="title">${book.fields.title}</h5>
+                <p class="card-text" id="year">${book.fields.author}</p>
+              </div>
+            </div>
+          </a>`);
+          });
+        } else {
+          console.log(response.message);
+        }
+      },
+      error: function (xhr, errmsg, err) {
+        console.log(xhr.status + ": " + xhr.responseText);
+      },
+    });
+  }
+
+  function load_favorites() {
+    // Kirim permintaan Ajax untuk mendapatkan buku yang telah difavoritkan
+    $.ajax({
+      type: "POST", // Ganti metode permintaan sesuai dengan kebutuhan Anda
+      url: "{% url 'bookreview:load_favorites' %}", // Tentukan URL untuk mendapatkan buku favorit
+      success: function (response) {
+        // Update daftar buku yang telah difavoritkan di antarmuka pengguna
+        const favoritesContainer = $("#fav-books");
+        favoritesContainer.empty();
+        $.each(JSON.parse(response.favorites), function (index, book) {
+          // Tambahkan buku ke daftar buku
+          favoritesContainer.append(`<a
+          href="#"
+          class="card-link"
+          data-book-id="${book.pk}"
+          data-title="${book.fields.title}"
+          data-author="${book.fields.author}"
+          data-year="${book.fields.published_year}"
+          data-genre="${book.fields.genre}"
+          data-pages="${book.fields.pages}"
+          data-description="${book.fields.description}"
+          data-thumbnail="${book.fields.thumbnail}"
+          data-ratings_avg="${book.fields.ratings_avg}"
+          data-ratings_count="${book.fields.ratings_count}"
+          data-isbn10="${book.fields.isbn10}"
+          data-isbn13="${book.fields.isbn13}"
+          data-review-url="book/${book.fields.isbn13}/review/"
+        >
+          <div class="card item" data-book-id="${book.pk}">
+            <img src="${book.fields.thumbnail}" class="card-img-top" alt="a book" />
+            <div class="card-body">
+              <h5 class="card-title" id="title">${book.fields.title}</h5>
+              <p class="card-text" id="year">${book.fields.author}</p>
+            </div>
+          </div>
+        </a>`);
+        });
+      },
+      error: function (xhr, errmsg, err) {
+        console.log(xhr.status + ": " + xhr.responseText);
+      },
+    });
+  }
+
+  function addFavorite(bookId) {
+    // Kirim permintaan Ajax untuk menambah buku ke favorit
+    $.ajax({
+      type: "POST",
+      url: `add-favorite/${bookId}/`,
+      success: function (response) {
+        // Refresh daftar buku favorit setelah penghapusan
+        alert(response.message);
+      },
+      error: function (xhr, errmsg, err) {
+        console.log(xhr.status + ": " + xhr.responseText);
+      },
+    });
+  }
+
+  function removeFavorite(bookId) {
+    // Kirim permintaan Ajax untuk menghapus buku dari favorit
+    $.ajax({
+      type: "POST",
+      url: `remove-favorite/${bookId}/`, // Sesuaikan URL ini dengan URL yang benar untuk menghapus dari favorit
+      success: function (response) {
+        // Refresh daftar buku favorit setelah penghapusan
+        alert(response.message);
+        load_favorites();
+      },
+      error: function (xhr, errmsg, err) {
+        console.log(xhr.status + ": " + xhr.responseText);
+      },
+    });
+  }
+</script>
+{% endblock %}

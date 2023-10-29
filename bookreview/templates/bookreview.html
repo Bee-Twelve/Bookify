@@ -1,0 +1,314 @@
+{% extends "layout.html" %} {% load static %} {% block head %}
+<!--Icon-->
+<link href="static/icons/icons8-repository-48.png" rel="icon" />
+{% endblock %} {% block title %} {{ book.title }} {% endblock %}
+<!-- Body -->
+{% block body %}
+<div class="container mt-5">
+  <div class="col-10 col-lg-8 pt-6 mb-3 mx-auto">
+    <div class="card">
+      <div class="card-header">Book Details</div>
+      <div class="card-body">
+        <div class="row mb-4">
+          <div class="col-12 col-md-4">
+            <img
+              src="{{ book.thumbnail }}"
+              alt="book thumbnail"
+              class="img-fluid w-100"
+            />
+          </div>
+          <div class="col">
+            <h5 class="card-title">{{ book.title }}</h5>
+            <p class="card-text">{{ book.description }}</p>
+            <p class="fw-bold">{{ book.genre }} | {{ book.published_year }}</p>
+            <p class="m-0"><b>Author :</b> {{ book.author }}</p>
+            <p class="m-0"><b>Pages :</b> {{ book.pages }}</p>
+            <p class="m-0"><b>Rating :</b> {{ book.ratings_avg }}/5</p>
+            <p class="m-0"><b>Total Reviewer :</b> {{ book.ratings_count }}</p>
+            <p class="m-0"><b>ISBN-10 :</b> {{ book.isbn10 }}</p>
+            <p class="m-0"><b>ISBN-13 :</b> {{ book.isbn13 }}</p>
+          </div>
+        </div>
+
+        {% if user.is_authenticated %}
+        <a
+          href="#review-form"
+          id="writeReview"
+          class="btn btn-primary"
+          role="button"
+          data-bs-toggle="modal"
+          data-bs-target="#reviewModal"
+          data-edit-url="{% url 'bookreview:add_review' book_id=book.isbn13 %}"
+          >Write a review</a
+        >
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-10 mt-10 mx-auto">
+    <hr class="border-white" />
+    <h4><strong>User reviews:</strong></h4>
+  </div>
+  <div class="row user-reviews justify-content-center">
+    {% for review in reviews %}
+    <div
+      class="col-10 mt-3 {% if request.user.is_authenticated and review.user == request.user %}order-1{% else %}order-2{% endif %}"
+    >
+      <div class="card bg-light mb-3">
+        <div class="card-body">
+          <h5 class="card-title">
+            <strong>Rating : {{ review.rating }}</strong>
+          </h5>
+          <p class="card-text">{{ review.comment }}</p>
+        </div>
+        {% if review.user == request.user %}
+        <div class="card-footer">
+          <button
+            type="button"
+            id="editReviewButton"
+            class="btn btn-sm btn-warning"
+            data-rating="{{ review.rating }}"
+            data-comment="{{ review.comment }}"
+            data-edit-url="{% url 'bookreview:update_review' review_id=review.pk %}"
+          >
+            Edit
+          </button>
+          <button
+            type="button"
+            class="btn btn-sm btn-danger"
+            data-bs-toggle="modal"
+            data-bs-target="#deleteModal{{ review.pk }}"
+          >
+            Delete
+          </button>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if review.user == request.user %}
+    <!-- Modal Delete -->
+    <div
+      class="modal fade"
+      id="deleteModal{{ review.pk }}"
+      tabindex="-1"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="exampleModalLabel">Review</h1>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">Delete your review?</div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+            <form
+              action="{% url 'bookreview:delete_review' review_id=review.pk %}"
+              method="POST"
+              id="delete"
+            >
+              {% csrf_token %}
+              <button type="submit" class="btn btn-danger">
+                Yes, Delete Review
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    {%endif%} {% endfor %}
+  </div>
+</div>
+
+<!-- Review Modal -->
+<div
+  class="modal fade"
+  id="reviewModal"
+  tabindex="-1"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form
+        action=""
+        method="POST"
+        class="needs-validation"
+        id="review"
+        novalidate
+      >
+        {% csrf_token %}
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Review Book</h1>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group review-form">
+            <input
+              type="text"
+              class="form-control"
+              id="book-review"
+              name="book_review"
+              aria-describedby="emailHelp"
+              placeholder="Write a short review."
+            />
+            <div class="review-checkbox">
+              <strong>Rating : <br /></strong>
+              <div class="form-check form-check-inline">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="book_rating"
+                  id="rating1"
+                  value="1"
+                />
+                <label class="form-check-label" for="rating1">1</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="book_rating"
+                  id="rating2"
+                  value="2"
+                />
+                <label class="form-check-label" for="rating2">2</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="book_rating"
+                  id="rating3"
+                  value="3"
+                />
+                <label class="form-check-label" for="rating3">3</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="book_rating"
+                  id="rating4"
+                  value="4"
+                />
+                <label class="form-check-label" for="rating4">4</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="book_rating"
+                  id="rating5"
+                  value="5"
+                />
+                <label class="form-check-label" for="rating5">5</label>
+              </div>
+            </div>
+            <hr />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <div class="login-submit-container">
+            <button type="submit" class="btn btn-success login-submit-button">
+              Leave a review
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %} {% block js_page %}
+<script>
+  // AJAX untuk mengirim formulir review
+  $(document).ready(function () {
+    $("#editReviewButton").click(function (e) {
+      const rating = $(this).data("rating");
+      const comment = $(this).data("comment");
+      const editUrl = $(this).data("edit-url");
+      console.log(rating, comment, editUrl);
+      $(`#rating${rating}`).prop("checked", true);
+      $("#book-review").val(comment);
+      $("form#review").prop("action", editUrl);
+
+      $("#reviewModal").modal("show");
+    });
+
+    $("#writeReview").click(function () {
+      $("form#review").prop("action", $(this).data("edit-url"));
+      $("#book-review").val("");
+      $('input[name="book_rating"]:checked').prop("checked", false);
+    });
+
+    $("form#review").submit(function (event) {
+      event.preventDefault();
+
+      $.ajax({
+        type: "POST",
+        url: $(this).attr("action"),
+        data: $(this).serialize(),
+        success: function (response) {
+          // Handle success response if needed
+          if (response.status === "success") {
+            // Review berhasil ditambahkan, lakukan tindakan sesuai kebutuhan
+            alert(response.message);
+            // Misalnya, muat ulasan kembali setelah review ditambahkan
+            // Implementasikan logika tampilan ulasan di sini
+          } else {
+            // Review gagal ditambahkan, tampilkan pesan error
+            alert(response.message);
+          }
+        },
+        error: function (error) {
+          // Handle error response if needed
+          alert("Terjadi kesalahan saat mengirim review.");
+        },
+      });
+    });
+
+    // AJAX untuk mengirim permintaan penghapusan review
+    $("form#delete").submit(function () {
+      event.preventDefault();
+
+      // Mengirim permintaan AJAX ke endpoint penghapusan review dengan reviewId sebagai parameter
+      $.ajax({
+        type: "POST",
+        url: $(this).attr("action"),
+        data: $(this).serialize(),
+        success: function (response) {
+          // Handle success response if needed
+          // Misalnya, menampilkan pesan sukses atau memperbarui tampilan ulasan pengguna
+          alert(response.message);
+        },
+        error: function (error) {
+          alert("Terjadi kesalahan saat menghapus review.");
+        },
+      });
+    });
+  });
+
+  $(document).ajaxStop(function () {
+    window.location.reload();
+  });
+</script>
+{% endblock %}

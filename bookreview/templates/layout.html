@@ -1,0 +1,110 @@
+{% extends 'base.html' %} {% load static %} {% block meta %}
+<link
+  rel="stylesheet"
+  href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+  integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+  crossorigin="anonymous"
+/>
+<!--<script
+  src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+  integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+  crossorigin="anonymous"
+></script>-->
+<script
+  src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+  integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+  crossorigin="anonymous"
+></script>
+<script
+  src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+  integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+  crossorigin="anonymous"
+></script>
+<link rel="stylesheet" href="{% static 'styles/style.css' %}" />
+
+{% block head %}{% endblock %}
+
+<title>| {% block title %}{% endblock %}</title>
+<style media="screen">
+  .navbar-brand {
+    font-size: 24px !important;
+  }
+  .nav-item {
+    font-size: 20px !important;
+  }
+</style>
+{% endblock %} {% block content %}
+<!--TODO: Add NavBar with: App Name, LogIn, LogOut, Register, etc-->
+<nav class="bg-gray-800">
+  <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+    <div class="relative flex h-16 items-center justify-between">
+      <div
+        class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start"
+      >
+        <div class="flex flex-shrink-0 items-center">
+          <h1 class="font-bold text-blue-500 text-2xl mt-0.5 mb-1 ml-0.5">
+            B O O K I F Y
+          </h1>
+        </div>
+        <div class="hidden sm:ml-6 sm:block">
+          <div class="flex space-x-4">
+            <a
+              href="{% url 'homepage:show_homepage' %}"
+              class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+              >Home</a
+            >
+          </div>
+        </div>
+      </div>
+      <div
+        class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0"
+      >
+        <button
+          type="button"
+          class="rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+        >
+          <span class="sr-only">View notifications</span>
+        </button>
+
+        <div class="relative ml-3">
+          {% if not user.is_authenticated %}
+          <div>
+            <button
+              class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+              onclick="location.href='/login/'"
+            >
+              Login
+            </button>
+          </div>
+          {% else %}
+
+          <div class="flex space-x-4">
+            <p
+              class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+            >
+              {{user.get_username}}
+            </p>
+            <button
+              class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+              onclick="location.href='/logout/'"
+            >
+              Logout
+            </button>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+{% block body %}{% endblock %}
+
+<footer class="p-4 bg-white shadow md:px-6 md:py-8 dark:bg-gray-900">
+  <hr class="my-6 border-gray-200 sm:mx-auto dark:border-gray-700 lg:my-8" />
+  <span class="block text-sm text-gray-500 sm:text-center dark:text-gray-400">
+    © 2023 Bookify™. All Rights (not) Reserved.
+  </span>
+</footer>
+
+{% block js_page %}{% endblock %} {% endblock %}

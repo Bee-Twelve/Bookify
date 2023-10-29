@@ -3,6 +3,9 @@ $.ajaxSetup({
     headers: { "X-CSRFToken": $('input[name=csrfmiddlewaretoken]').val() }
 });
 
+// Global Search
+let searchQuery = ''
+
 // ==================================================================
 
 // BOOKSHELF TAB / CARDS
@@ -11,14 +14,14 @@ $(document).ready(function() {
         event.preventDefault();
         $("#library").hide();
         $.ajax({
-        url: '/booklibrary/get-user-bookshelf/',
-        type: 'GET',
-        dataType: 'json',
-        success: function(data) {
-            console.log(data);
-            var content = '';
-            $.each(data, function(index, book) {
-                content += `
+            url: '/booklibrary/get-user-bookshelf/',
+            type: 'GET',
+            dataType: 'json',
+            success: function (data) {
+                console.log(data);
+                var content = '';
+                $.each(data, function (index, book) {
+                    content += `
                     <a href="#" class="card-link"
                        data-book-id="${book.id}" 
                        data-title="${book.title}"
@@ -42,16 +45,16 @@ $(document).ready(function() {
                             </div>
                         </div>
                     </a>`;
-            });
-            $("#bookshelf").html(content).show();
-        },
-        error: function(error) {
-            console.error("Error fetching bookshelf:", error);
-        }
-    });
+                });
+                $("#bookshelf").html(content).show();
+            },
+            error: function (error) {
+                console.error("Error fetching bookshelf:", error);
+            }
+        });
     });
 
-    $("#libraryLink").click(function(event) {
+    $("#libraryLink").click(function (event) {
         event.preventDefault();
         $("#bookshelf").hide();
         $("#library").show();
@@ -123,6 +126,86 @@ function showNotificationFailed() {
   }
 
 $(document).on('click', '.borrowRead', function(event) {
+    event.preventDefault();
+    let bookId = $(this).data('book-id');
+    $.ajax({
+        url: '/booklibrary/borrow-book/', 
+        method: 'POST',
+        data: {
+            'book_id': bookId,
+            'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
+        },
+        success: function (response) {
+            if (response.status === 'success') {
+                window.scrollTo(0, 0);
+                showNotificationSuccess();
+                $('#bookDetailsModal').modal('hide');
+
+            } else {
+                window.scrollTo(0, 0);
+                showNotificationFailed();
+                $('#bookDetailsModal').modal('hide');
+            }
+        },
+        error: function() {
+            alert('An error occurred. Please try again.');
+        }
+    });
+});
+
+// ==================================================================
+
+// COMPLETE READING FEATURE
+function showReadingSuccess() {
+    $('#readingSuccess').show().delay(3000).fadeOut(); // This will display the notification and hide it after 5 seconds.
+  }
+function showReadingFailed() {
+    $('#readingFailed').show().delay(3000).fadeOut(); // This will display the notification and hide it after 5 seconds.
+  }
+$(document).on('click', '.completeReading', function(event) {
+    event.preventDefault();
+    let bookId = $(this).data('book-id');
+    $.ajax({
+        url: '/booklibrary/complete-reading/', // Update the URL based on your Django URL structure
+        method: 'POST',
+        data: {
+            'book_id': bookId,
+            'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
+        },
+        success: function(response) {
+
+            if (response.status === 'success') {
+                $(`[data-status-id="${bookId}"]`).text('Status: Completed');
+                // Update the modal button
+                $('#borrowReadButton').text('Re-read Book');
+                $('#borrowReadButton').attr('class', 'btn btn-info reRead');
+                // Update the status data attribute for the card link
+                $(`.card-link[data-book-id="${bookId}"]`).data('status', 'Completed');
+                window.scrollTo(0, 0);
+                showReadingSuccess();
+                $('#bookDetailsModal').modal('hide');
+
+            } else {
+                window.scrollTo(0, 0);
+                showReadingFailed();
+                $('#bookDetailsModal').modal('hide');
+            }
+        },
+        error: function () {
+            alert('An error occurred. Please try again.');
+        }
+    });
+});
+
+// RE-READING FEATURE
+function showReReadingSuccess() {
+    $('#reReadingSuccess').show().delay(3000).fadeOut(); // This will display the notification and hide it after 5 seconds.
+  }
+function showReReadingFailed() {
+    $('#reReadingFailed').show().delay(3000).fadeOut(); // This will display the notification and hide it after 5 seconds.
+  }
+
+  $(document).on('click', '.borrowRead', function(event) {
     event.preventDefault();
     let bookId = $(this).data('book-id');
     $.ajax({
