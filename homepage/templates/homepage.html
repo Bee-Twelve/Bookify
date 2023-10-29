@@ -17,7 +17,7 @@
       >
         <div class="flex flex-shrink-0 items-center">
           <h1 class="font-bold text-blue-500 text-2xl mt-0.5 mb-1 ml-0.5">
-            B O O K I F Y
+            <strong>B O O K I F Y</strong>
           </h1>
         </div>
         <div class="hidden sm:ml-6 sm:block">
@@ -25,7 +25,7 @@
             <a
               href="{% url 'homepage:show_homepage' %}"
               class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-              >Home</a
+              ><strong> Home </strong></a
             >
           </div>
         </div>
@@ -47,7 +47,7 @@
               class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
               onclick="location.href='/login/'"
             >
-              Login
+              <strong>Login</strong>
             </button>
           </div>
           {% else %}
@@ -56,13 +56,13 @@
             <p
               class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
             >
-              {{user.get_username}}
+              <strong>{{user.get_username}}</strong>
             </p>
             <button
               class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
               onclick="location.href='/logout/'"
             >
-              Logout
+              <strong>Logout</strong>
             </button>
           </div>
           {% endif %}
@@ -116,13 +116,13 @@
           </h5>
         </div>
         <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">
-          PENJELASAN
+          Implementasi private library untuk user dengan penandaan status "pernah membaca", rekomendasi buku yang cocok utk user, dan bookstore.
         </p>
         <a
           href="{% url 'booklibrary:show_library' %}"
           class="inline-flex items-center py-2 px-3 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
         >
-          Contribute
+          Join!
         </a>
       </div>
     </div>
@@ -147,13 +147,13 @@
           </h5>
         </div>
         <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">
-          PENJELASAN
+          Implementasi dari fitur ini yaitu agar user dapat memberikan ulasan & rating buku, serta menambahkan daftar buku favorit ke dalam list favoritnya.
         </p>
         <a
           href="{% url 'bookreview:show_library' %}"
           class="inline-flex items-center py-2 px-3 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 align-bottom"
         >
-          Contribute
+          Join!
         </a>
       </div>
     </div>
@@ -178,13 +178,13 @@
           </h5>
         </div>
         <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">
-          PENJELASAN
+          Media untuk berdonasi buku yang disalurkan ke sekolah, panti asuhan, dan lain sebagainya.
         </p>
         <a
           href="{% url 'bookdonation:show_donation' %}"
           class="inline-flex items-center py-2 px-3 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
         >
-          Contribute
+          Join!
         </a>
       </div>
     </div>
@@ -211,18 +211,13 @@
           </h5>
         </div>
         <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">
-          PENJELASAN
+          Pembuatan komunitas sesuai dengan minat bacaan, serta implementasi fitur diskusi.
         </p>
         <a
           href="{% url 'bookcommunity:show_community' %}"
           class="inline-flex items-center py-2 px-3 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-<<<<<<< HEAD
         >
-          Contribute
-=======
-        >        
-        Contribute
->>>>>>> origin
+          Join!
         </a>
       </div>
     </div>
@@ -247,13 +242,13 @@
           </h5>
         </div>
         <p class="mb-3 font-normal text-gray-700 dark:text-gray-400">
-          PENJELASAN
+          Filter informasi data buku yang "akan dibaca" oleh user.
         </p>
         <a
           href="{% url 'bookmark:show_bookmark' %}"
           class="inline-flex items-center py-2 px-3 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
         >
-          Contribute
+          Join!
         </a>
       </div>
     </div>
@@ -265,71 +260,71 @@
       <div
         class="grid grid-cols-1 md:grid-cols-2 gap-x-px w-3/4 place-items-center justify-center rounded-md bg-gray-100 shadow-2xl"
       >
-        <div class="w-4/5 md:w-3/5 text-align:center mt-10">
-          {% if user.is_authenticated %}
-          <div class="flex flex-col">
+      <div class="w-4/5 md:w-3/5 text-align-center mt-10">
+        {% if user.is_authenticated %}
+        <div class="flex flex-col">
             <div class="flex justify-between">
-              <h6>Full Name:</h6>
-              <p>{{ request.user.full_name }}</p>
+                <h6><strong>Full Name:</strong></h6>
+                <p>{{ request.user.full_name }}</p>
             </div>
             <div class="flex justify-between">
-              <h6>Email:</h6>
-              <p>{{ request.user.email }}</p>
+                <h6><strong>Email:</strong></h6>
+                <p>{{ request.user.email }}</p>
             </div>
             <div class="flex justify-between">
-              <h6>Address:</h6>
-              <p>{{ request.user.address }}</p>
+                <h6><strong>Address:</strong></h6>
+                <p>{{ request.user.address }}</p>
             </div>
             <div class="flex justify-between">
-              <h6>Phone Number:</h6>
-              <p>{{ request.user.phone_number }}</p>
+                <h6><strong>Phone Number:</strong></h6>
+                <p>{{ request.user.phone_number }}</p>
             </div>
             <div class="flex justify-between">
-              <h6>Birthplace:</h6>
-              <p>{{ request.user.birthplace }}</p>
+                <h6><strong>Birthplace:</strong></h6>
+                <p>{{ request.user.birthplace }}</p>
             </div>
             <div class="flex justify-between">
-              <h6>Birthdate:</h6>
-              <p>{{ request.user.birthdate }}</p>
+                <h6><strong>Birthdate:</strong></h6>
+                <p>{{ request.user.birthdate }}</p>
             </div>
-          </div>
-          {% else %}
-          <div class="flex justify-center">
+        </div>
+        {% else %}
+        <div class="flex justify-center">
             <a
-              href="{% url 'homepage:register' %}"
-              id="get-count-btn"
-              class="align-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md"
+                href="{% url 'homepage:register' %}"
+                id="get-count-btn"
+                class="align-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md"
             >
-              Register
+                <strong>Register</strong>
             </a>
-          </div>
-          <p
+        </div>
+        <p
             id="campaign-count"
             class="text-[120px] textfont-bold justify-center text-center"
-          ></p>
-          <p id="count-detail" class="text-gray-700 text-center mb-10">
+        ></p>
+        <p id="count-detail" class="text-gray-700 text-center mb-10">
             Click the button above
-          </p>
-          {% endif %}
-        </div>
-
+        </p>
+        {% endif %}
+    </div>
+    
         <div id="persuade" class="w-5/5 text-justify mx-10 my-10">
-          <p>PENJELASAN WEB</p>
+          <p>Bookify adalah platform yang bertujuan untuk meningkatkan minat membaca di Indonesia, terutama di kalangan remaja dan dewasa. 
+            Dalam upaya mencapai tujuan ini, Bookify menyediakan berbagai fitur dan layanan, termasuk pencarian buku, pembelian buku, berpartisipasi 
+            dalam komunitas buku, serta memberikan ulasan tentang buku yang telah dibaca. Platform ini juga memiliki toko buku dan perpustakaan virtual 
+            yang memungkinkan pengguna untuk meminjam buku. Selain itu, Bookify memungkinkan pengguna untuk berdonasi buku ke sekolah atau instansi. 
+            Dengan berbagai fitur ini, Bookify ingin menciptakan komunitas baca yang luas di Indonesia.</p>
         </div>
       </div>
     </div>
 
-    <!-- about us -->
-    <div
-      class="flex justify-center py-10 bg-slate-800 text-white opacity-100 hover:bg-slate-900 mt-20"
-    >
-      <div>
-        <p class="text-2xl text-center">About Us</p>
-        <div class="flex justify-center">
-          <p class="w-4/5 md:w-3/5 text-justify">B12-Bookstore</p>
-        </div>
-      </div>
+  <!-- about us -->
+  <div class="flex flex-col items-center justify-center py-10 bg-slate-800 text-white opacity-100 hover:bg-slate-900 mt-20">
+    <div>
+      <p class="text-2xl text-center mb-4">B-12 Bookstore</p>
+      <p class="text-2xl text-center mb-4">Lisa - Daril - Ghina - Hilmi - Thariq</p>
     </div>
+  </div>
   </container>
 
   <footer class="p-4 bg-white shadow md:px-6 md:py-8 dark:bg-gray-900">
