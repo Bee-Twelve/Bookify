@@ -36,9 +36,9 @@ def add_bookmark(request, book_id):
     if not Bookmark.objects.filter(user=user, book=book).exists():
         bookmark = Bookmark(user=user, book=book)
         bookmark.save()
-        messages.success(request, f'"{book.book.title}" telah ditambahkan ke bookmark Anda.')
-    else:
-        messages.warning(request, f'"{book.book.title}" sudah ada di bookmark Anda.')  
+    #     messages.success(request, f'"{book.book.title}" telah ditambahkan ke bookmark Anda.')
+    # else:
+    #     messages.warning(request, f'"{book.book.title}" sudah ada di bookmark Anda.')  
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 @login_required
