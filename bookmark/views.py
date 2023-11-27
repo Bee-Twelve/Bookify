@@ -18,7 +18,8 @@ def show_bookmark(request):
     bookmarks = UserBook.objects.filter(user=user)
 
     if genre:
-        bookmarks = Books.filter(book__book__genre=genre)
+        bookmarks = UserBook.objects.filter(book__genre__icontains=genre)
+        
 
     context = {
         'bookmarks': bookmarks,
@@ -59,7 +60,7 @@ def show_bookmarked(request):
     bookmarks = Bookmark.objects.filter(user=user)
 
     if genre:
-        bookmarks = Books.filter(book__book__genre=genre)
+        bookmarks = Books.objects.filter(book__book__genre=genre)
 
     context = {
         'bookmarks': bookmarks,
