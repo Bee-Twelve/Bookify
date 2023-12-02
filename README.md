@@ -1,6 +1,6 @@
 # Bookify-Web
 
-### Link to our website :  ...
+### Link to our website :  https://beetwelve.site/
 
 # **Anggota Kelompok `B12` :**
 
@@ -14,7 +14,7 @@
 
 - `Thariq Ziyad Al Farizi - 2206082865`
 
-# **Cerita Aplikasi yang Diajukan serta Manfaatnya: **
+# Cerita Aplikasi yang Diajukan serta Manfaatnya:
 Bookify merupakan website yang kami kembangkan ditujukan kepada kalangan dimulai dari remaja hingga dewasa, dimana mereka bisa mencari, membeli, dan berdiskusi mengenai buku pilihan mereka dengan komunitas yang ada di platform ini. Latar belakang kami untuk menginisiasi website ini disebabkan oleh sedikitnya persentase masyarakat di Indonesia yang berminat membaca buku. Fakta ini didukung oleh penelitian dari UNESCO yang menyebutkan bahwa Indonesia menempati urutan kedua dari bawah soal literasi dunia, artinya minat baca sangat rendah. Disebutkan juga bahwa persentase minat baca di Indonesia hanya 0.001% artinya hanya 1 dari 1000 orang Indonesia yang memiliki minat baca yang tinggi. Berdasarkan fakta tersebut, kami termotivasi untuk mencoba membangun komunitas baca di Indonesia agar lebih luas lagi dengan mengembangkan website yang memiliki media untuk berdiskusi dan mencari teman yang memiliki interest yang sama di suatu komunitas yang juga memiliki segala sumber informasi mengenai buku dari semua jenis dan genre. Disini para peminat buku juga dapat langsung membeli buku yang mereka minati di BookShop kita yang akan mengarahkan langsung ke website e-commerce yang sesuai. Tetapi tidak hanya itu, apabila mereka belum yakin untuk membelinya langsung, mereka juga dapat mengakses library yang tersedia di website kami untuk meminjam buku (terbatas) serta memberikan ulasan dari buku yang telah dibaca, jadi mereka dapat tetap membaca dan gabung dalam komunitas di platform kami tanpa mengeluarkan sepeserpun. Untuk fitur pelengkap, kami menambahkan halaman donasi untuk user yang ingin berdonasi ke instansi/sekolah untuk paket up to 50+ buku, bisa berupa buku pelajaran, cerita, dan lain-lain.
 
 **Manfaat Website:**
@@ -29,7 +29,7 @@ Bookify merupakan website yang kami kembangkan ditujukan kepada kalangan dimulai
 
 # **Daftar Modul yang Diimplementasikan:**
 1. *Modul Library (Daril):*
-Implementasi private library untuk user dengan penandaan status "pernah membaca", rekomendasi buku yang cocok utk user, dan bookstore.
+Implementasi private library untuk user dengan penandaan status "pernah membaca", rekomendasi buku yang cocok untuk user, dan bookstore.
 
 2. *Modul Book Review & Favorites (Ghina):*
 Implementasi dari fitur ini yaitu agar user dapat memberikan ulasan & rating buku, serta menambahkan daftar buku favorit ke dalam list favoritnya.
