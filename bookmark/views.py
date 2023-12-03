@@ -18,13 +18,14 @@ def show_bookmark(request):
     bookmarks = UserBook.objects.filter(user=user)
 
     if genre:
-        bookmarks = UserBook.objects.filter(book__genre__icontains=genre)
+        bookmarks = bookmarks.filter(book__genre__icontains=genre)
         
 
     context = {
         'bookmarks': bookmarks,
         'selected_genre': genre,
     }
+
 
     return render(request, 'show_bookmark.html', context)
 
