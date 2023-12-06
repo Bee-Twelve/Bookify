@@ -153,6 +153,7 @@
                 <div class="modal-body">
                     <div class="text-center">
                         <p>Berikut adalah QR untuk menyelesaikan pesanan Anda:</p>
+                        <p>T</p>
                         <img src="https://img.freepik.com/premium-vector/unique-qr-code-isolated-white-back_251819-2203.jpg?w=740" alt="QR Code">
                     </div>
                 </div>
@@ -199,8 +200,13 @@
                 <td>
                     <form method="post" action="{% url 'bookdonation:hapus_produk' product.id %}">
                         {% csrf_token %}
+
+                        {% if product.status == "Sudah diverifikasi" %}
+                        <script>
+                            document.querySelector(".btn-hapus[data-product-id='{{ product.id }}']").style.display = "none";
+                        </script>
+                    {% endif %}
                        
-                        <button class="btn btn-danger btn-sm btn-hapus" data-product-id="{{ product.id }}">Hapus</button>
                 
                 <td>{{ product.status }}</td>
                 

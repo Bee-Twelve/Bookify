@@ -1,4 +1,5 @@
 from django.db import models
+from books.models import Books
 from django.contrib.auth.models import User
 from django.conf import settings
 
@@ -12,17 +13,12 @@ from django.conf import settings
 
 # BECAUSE WE ARE USING CUSTOM USER
 #--------------------------------------------------------------------------------------------------
-
-class Book(models.Model):
-    title = models.CharField(max_length=200)
-    author = models.CharField(max_length=100)
-
 class Review(models.Model):
-    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    book = models.ForeignKey(to=Books, on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     rating = models.PositiveIntegerField()
     comment = models.TextField()
 
 class Favorite(models.Model):
-    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    book = models.ForeignKey(to=Books, on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)

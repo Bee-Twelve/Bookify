@@ -6,6 +6,10 @@
     background-color: green;
     }
 
+.no-margin {
+    margin: 0;
+}
+    
 .container {
     display: flex;
     flex-flow: row wrap;
@@ -27,7 +31,7 @@
     width: 10rem;
     flex: auto;
     margin: 15px; /* Some margin to space out the items */
-    border: 1px solid red;
+
 }
 
 /* ================CARD SETTINGS================== */
@@ -52,13 +56,21 @@
 }
 
 .card-title {
-    height: 3rem;
-    max-height: 3rem;
+    margin: 0;
+    height: 52px;
+
     overflow: hidden;
     display: -webkit-box;
     -webkit-line-clamp: 2; /* limits the content to a maximum of 2 lines */
     -webkit-box-orient: vertical;
+    border: 1px solid red;
 }
+
+.card-body {
+    /* border: 1px solid red; */
+}
+
+/* ===================CLASS SETTINGS=================== */
 
 .list-group-item {
     height: auto;
@@ -66,16 +78,22 @@
     text-align: center;
 }
 
-/* ===================CLASS SETTINGS=================== */
-
-
 /* ===================ID SETTINGS================= */
 #title {
     color: black;
 }
 
 #year {
+    font-size: 14px;
+    font-style: italic;
     color: black;
+    height: 1.5rem;
+    max-height: 3rem;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* limits the content to a maximum of 2 lines */
+    -webkit-box-orient: vertical;
+    /* border: 1px solid green; */
 }
 
 #searchBar {

@@ -1,138 +1,224 @@
-{% extends 'base.html' %}
-{% load static %}
-
-{% block meta %}
+{% extends 'base.html' %} {% load static %} {% block meta %}
 <title>Library</title>
-<link rel="stylesheet" href="{% static 'booklibrary_static/css/styles.css' %}"/>
-{% endblock meta %}
+<link rel="stylesheet" href="{% static 'homepage_static/css/styles.css' %}" />
+<link
+  rel="stylesheet"
+  href="{% static 'booklibrary_static/css/styles.css' %}"
+/>
+{% endblock meta %} {% block content %}
 
-{% block content %}
-<!-- <div class="container">
-    <h1>Test</h1>
-
-    <ul>
-        {% for book in books %}
-            <li class="item">
-                <h2>{{ book.title }}</h2>
-                <p><img src="{{ book.thumbnail }}" alt="a book"></p>
-                <a href="https://www.amazon.com/s?k={{ book.isbn13 }}" 
-                   target="_blank" 
-                   rel="noopener noreferrer">Redirect to Amazon</a>
-            </li>
-        {% endfor %}
-    </ul>
-</div> -->
-
-<!-- <h1 class="center">Test</h1> -->
-
+<!-- BOOKIFY NAVBAR -->
 <nav class="bg-gray-800">
-    <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
-      <div class="relative flex h-16 items-center justify-between">
-        <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-          <div class="flex flex-shrink-0 items-center">
-            <h1 class="font-bold text-blue-500 text-2xl mt-0.5 mb-1 ml-0.5">B O O K I F Y</h1>
-          </div>
-          <div class="hidden sm:ml-6 sm:block">
-            <div class="flex space-x-4 ">
-                <a href="{% url 'homepage:show_homepage' %}" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Home</a>
-            </div>
+  <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+    <div class="relative flex h-16 items-center justify-between">
+      <div
+        class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start"
+      >
+        <div class="flex flex-shrink-0 items-center">
+          <h1 class="font-bold text-blue-500 text-2xl mt-0.5 mb-1 ml-0.5">
+            B O O K I F Y
+          </h1>
+        </div>
+        <div class="hidden sm:ml-6 sm:block">
+          <div class="flex space-x-4">
+            <a
+              href="{% url 'homepage:show_homepage' %}"
+              class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+              >Home</a
+            >
           </div>
         </div>
-        <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-          <button type="button" class="rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
-            <span class="sr-only">View notifications</span>
-            
-          </button>
+      </div>
+      <div
+        class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0"
+      >
+        <button
+          type="button"
+          class="rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+        >
+          <span class="sr-only">View notifications</span>
+        </button>
 
-          <div class="relative ml-3">
-            {% if not user.is_authenticated %}
-            <div>
-                <button class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" onclick="location.href='/login/'">Login</button>
-            </div>
-            {% else %} 
-          
-            <div class="flex space-x-4">
-              <p class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">{{user.get_username}}</p>
-              <button class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" onclick="location.href='/logout/'">Logout</button>
-            </div>
-            {% endif %}
+        <div class="relative ml-3">
+          {% if not user.is_authenticated %}
+          <div>
+            <button
+              class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+              onclick="location.href='/login/'"
+            >
+              Login
+            </button>
           </div>
+          {% else %}
 
+          <div class="flex space-x-4">
+            <p
+              class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+            >
+              {{user.get_username}}
+            </p>
+            <button
+              class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+              onclick="location.href='/logout/'"
+            >
+              Logout
+            </button>
+          </div>
+          {% endif %}
         </div>
       </div>
     </div>
+  </div>
 </nav>
 
+<!-- LIBRARY/BOOKSHELF NAVBAR -->
 <ul class="nav nav-tabs">
-    <li class="nav-item">
-        <a class="nav-link active" href="#library" data-toggle="tab">Library</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#bookshelf" data-toggle="tab">Bookshelf</a>
-    </li>
+  <li class="nav-item">
+    <a
+      class="nav-link active"
+      href="#libraryTab"
+      data-toggle="tab"
+      id="libraryLink"
+      >Library</a
+    >
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="#bookshelf" data-toggle="tab" id="bookshelfLink"
+      >Bookshelf</a
+    >
+  </li>
 </ul>
 
-<input type="text" class="form-control" id="searchBar" placeholder="Search for a book...">
+<!-- ALERT -->
+<!-- =========BORROW/READ=========== -->
+<div id="notificationSuccess" class="alert alert-success" role="alert" style="display: none;">
+  Book added to your shelf successfully!
+</div>
+<div id="notificationFailed" class="alert alert-warning" role="alert" style="display: none;">
+  Book is already in your shelf!
+</div>
+<!-- =========COMPLETE/READ=========== -->
+<div id="readingSuccess" class="alert alert-success" role="alert" style="display: none;">
+  You have completed reading this book!
+</div>
+<div id="readingFailed" class="alert alert-warning" role="alert" style="display: none;">
+  Something went wrong, please try again later!
+</div>
+<!-- =========REREADING/READ=========== -->
+<div id="reReadingSuccess" class="alert alert-success" role="alert" style="display: none;">
+  Good Job! You are re-reading this book!
+</div>
+<div id="reReadingFailed" class="alert alert-warning" role="alert" style="display: none;">
+  Something went wrong, please try again later!
+</div>
 
-<div class="container">
-    <ul>
-        {% for book in books %}
-            <a href="#" class="card-link">
-            <div class="card item">
-                <img src="{{ book.thumbnail }}" class="card-img-top" alt="a book">
-                <div class="card-body">
-                  <h5 class="card-title" id="title">{{ book.title }}</h5>
-                  <p class="card-text" id="year">{{ book.published_year }}</p>
-                </div>
-                <ul class="list-group list-group-flush" style="border: 1px solid blue; height:auto;">
-                  <li class="list-group-item">{{ book.genre }}</li>
-                  <li class="list-group-item">Rating: {{ book.ratings_avg }}/5</li>
-                  <li class="list-group-item">Rating Counts: {{ book.ratings_count }}</li>
-                </ul>
-                <!-- <div class="card-body">
-                  <button
-                  type="button"
-                  href="https://www.amazon.com/s?k={{ book.isbn13 }}" 
-                  class="btn btn-warning btn-sm"
-                  target="_blank"
-                  rel="noopener noreferrer">Buy this book</a>
-                </div>
-                <div class="card-body">
-                  <a type="button" href="#" class="btn btn-info btn-sm">Details</a>
-                </div> -->
-            </div>
-            </a>
-        {% endfor %}
-    </ul>
+<!-- LIBRARY TAB/CARDS -->
+<div class="container" id="library">
+  {% for book in books %}
+      <!-- MENYIMPAN DATA UNTUK DIAMBIL DI MODAL & CLICKABLE CARD-->
+      <a href="#" class="card-link"
+         data-book-id="{{ book.id }}" 
+         data-title="{{ book.title }}"
+         data-author="{{ book.author }}"
+         data-year="{{ book.published_year }}"
+         data-genre="{{ book.genre }}"
+         data-pages="{{ book.pages }}"
+         data-description="{{ book.description }}"
+         data-thumbnail="{{ book.thumbnail }}"
+         data-ratings_avg="{{ book.ratings_avg }}"
+         data-ratings_count="{{ book.ratings_count }}"
+         data-isbn10="{{ book.isbn10 }}" 
+         data-isbn13="{{ book.isbn13 }}" 
+         data-source="library"
+         data-status="not_started">
+
+      <!-- TAMPILAN CARDS -->
+      <div class="card item" data-book-id="{{ book.id }}">
+          <img src="{{ book.thumbnail }}" class="card-img-top" alt="a book">
+          <div class="card-body">
+            <h5 class="card-title" id="title">{{ book.title }}</h5>
+            <p class="card-text" id="year">{{ book.author }}</p>
+          </div>
+      </div>
+
+      </a>
+  {% endfor %}
+</div>
+
+<!-- BOOKSHELF TAB/CARDS -->
+<div class="container" id="bookshelf" style="display: none"></div>
+
+<!-- BOOK'S MODAL -->
+<div
+  class="modal fade"
+  id="bookDetailsModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalBookTitle">Book Title</h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Book details go here -->
+        <img id="modalBookThumbnail" src="" alt="Book Thumbnail" />
+        <br />
+        <h6><b>Description:</b></h6>
+        <p id="modalBookDescription"></p>
+        <p class="no-margin">
+          <b><span id="modalBookGenreYear"></span></b>
+        </p>
+        <p class="no-margin">
+          <b>Author :</b> <span id="modalBookAuthor"></span>
+        </p>
+        <p class="no-margin">
+          <b>Pages :</b> <span id="modalBookPages"></span>
+        </p>
+        <p class="no-margin">
+          <b>Rating :</b> <span id="modalBookAvgRate"></span>/5
+        </p>
+        <p class="no-margin">
+          <b>Total Reviewer :</b> <span id="modalBookCountRate"></span>
+        </p>
+        <p class="no-margin">
+          <b>ISBN-10 :</b> <span id="modalBookIsbn10"></span>
+        </p>
+        <p class="no-margin">
+          <b>ISBN-13 :</b> <span id="modalBookIsbn13"></span>
+        </p>
+        <br />
+        <!-- Borrow/Read button -->
+        <button id="borrowReadButton" class="btn btn-primary"></button>
+        <!-- Buy on Amazon button -->
+        <a
+          id="buyOnAmazonButton"
+          href="#"
+          target="_blank"
+          class="btn btn-warning"
+          >Buy on <b>Amazon</b></a
+        >
+      </div>
+    </div>
+  </div>
 </div>
 
 
+
+<!-- CSRF TOKEN -->
+<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}" />
+
+<!-- =======================SCRIPT SECTION======================= -->
 <script src="{% static 'booklibrary_static/js/script.js' %}"></script>
-<script>
-document.getElementById("bookshelfLink").addEventListener("click", function(event) {
-    event.preventDefault();
-    document.getElementById("libraryContent").style.display = "none";
-    document.getElementById("bookshelfContent").style.display = "block";
-});
 
-document.getElementById("libraryLink").addEventListener("click", function(event) {
-    event.preventDefault();
-    document.getElementById("bookshelfContent").style.display = "none";
-    document.getElementById("libraryContent").style.display = "block";
-});
-
-$(document).ready(function() {
-    $("#bookshelfLink").click(function(event) {
-        event.preventDefault();
-        $("#libraryContent").hide();
-        $("#bookshelfContent").show();
-    });
-
-    $("#libraryLink").click(function(event) {
-        event.preventDefault();
-        $("#bookshelfContent").hide();
-        $("#libraryContent").show();
-    });
-});
-</script>
 {% endblock content %}

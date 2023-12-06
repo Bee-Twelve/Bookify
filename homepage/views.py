@@ -14,7 +14,7 @@ from .forms import BookForm, CustomUserCreationForm
 from .models import Book
 
 import datetime
-import json
+import json 
 
 
 def show_homepage(request):
@@ -62,3 +62,11 @@ def login_user(request):
 def logout_user(request):
     logout(request)
     return redirect('homepage:login')
+
+def show_book_review(request):
+    # Your view logic here
+    context = {
+        "form": form,
+        "last_question": request.session.get('last_login', 'have not submitted a question yet')
+    }
+    return render(request, 'bookreview.html', context)
