@@ -1,16 +1,12 @@
-{% extends 'base.html' %} 
-{% load static %} 
-
-{% block meta %}
+{% extends 'base.html' %} {% load static %} {% block meta %}
 <title>Library</title>
 <link rel="stylesheet" href="{% static 'homepage_static/css/styles.css' %}" />
 <link
   rel="stylesheet"
   href="{% static 'booklibrary_static/css/styles.css' %}"
 />
-{% endblock meta %} 
+{% endblock meta %} {% block content %}
 
-{% block content %}
 <!-- BOOKIFY NAVBAR -->
 <nav class="bg-gray-800">
   <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
@@ -88,11 +84,10 @@
 </nav>
 
 <!-- LIBRARY/BOOKSHELF NAVBAR -->
-<!-- <ul class="nav nav-tabs" style="background-color: #245877;">
+<ul class="nav nav-tabs">
   <li class="nav-item">
     <a
-      style="color: black;"
-      class="nav-link"
+      class="nav-link active"
       href="#libraryTab"
       data-toggle="tab"
       id="libraryLink"
@@ -100,16 +95,11 @@
     >
   </li>
   <li class="nav-item">
-    <a 
-       style="color: black;"
-       class="nav-link" 
-       href="#bookshelf" 
-       data-toggle="tab" 
-       id="bookshelfLink"
+    <a class="nav-link" href="#bookshelf" data-toggle="tab" id="bookshelfLink"
       >Bookshelf</a
     >
   </li>
-</ul> -->
+</ul>
 
 <!-- ALERT -->
 <!-- =========BORROW/READ=========== -->
@@ -135,30 +125,40 @@
 </div>
 
 <!-- LIBRARY TAB/CARDS -->
-<div id="libraryTab" class="container">
-  <div class="box">
-    <form id="search_book">
-      <div class="input-group">
-        <input
-          type="text"
-          id="search_bar"
-          name="txt"
-          class="input"
-          onmouseout="this.value = ''; this.blur();"
-        />
-        <!-- <button class="btn btn-dark" type="submit">Search</button> -->
+<div class="container" id="library">
+  {% for book in books %}
+      <!-- MENYIMPAN DATA UNTUK DIAMBIL DI MODAL & CLICKABLE CARD-->
+      <a href="#" class="card-link"
+         data-book-id="{{ book.id }}" 
+         data-title="{{ book.title }}"
+         data-author="{{ book.author }}"
+         data-year="{{ book.published_year }}"
+         data-genre="{{ book.genre }}"
+         data-pages="{{ book.pages }}"
+         data-description="{{ book.description }}"
+         data-thumbnail="{{ book.thumbnail }}"
+         data-ratings_avg="{{ book.ratings_avg }}"
+         data-ratings_count="{{ book.ratings_count }}"
+         data-isbn10="{{ book.isbn10 }}" 
+         data-isbn13="{{ book.isbn13 }}" 
+         data-source="library"
+         data-status="not_started">
+
+      <!-- TAMPILAN CARDS -->
+      <div class="card item" data-book-id="{{ book.id }}">
+          <img src="{{ book.thumbnail }}" class="card-img-top" alt="a book">
+          <div class="card-body">
+            <h5 class="card-title" id="title">{{ book.title }}</h5>
+            <p class="card-text" id="year">{{ book.author }}</p>
+          </div>
       </div>
-    </form>
-    <i class="fas fa-search"></i>
-  </div>
 
-  <div class="container" id="library"></div>
-
+      </a>
+  {% endfor %}
 </div>
 
 <!-- BOOKSHELF TAB/CARDS -->
-<div class="container" id="bookshelf" style="display: none;">
-</div>
+<div class="container" id="bookshelf" style="display: none"></div>
 
 <!-- BOOK'S MODAL -->
 <div
