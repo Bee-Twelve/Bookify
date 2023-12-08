@@ -19,5 +19,4 @@ urlpatterns = [
     path('create-product-ajax/', add_product_ajax, name='add_product_ajax'),
     path('hapus_produk_ajax/<int:product_id>/', hapus_produk_ajax, name='hapus_produk_ajax')
     
-
 ]

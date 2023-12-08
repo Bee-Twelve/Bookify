@@ -166,7 +166,7 @@ def ajax_update_review(request, review_id):
 @csrf_exempt
 def ajax_delete_review(request, review_id):
     response_data = {}
-    review = get_object_or_404(Review, pk=review_id)
+    review = get_object_or_404(Review, pk=review_id, user=request.user)
 
     # Memanggil fungsi update_book_ratings untuk mengupdate ratings_count dan ratings_avg
     update_book_ratings(review.book, review.rating, action='delete')

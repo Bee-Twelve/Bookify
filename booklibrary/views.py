@@ -100,7 +100,6 @@ def complete_reading(request):
         else:
             return JsonResponse({'status': 'error', 'message': 'Book is not in your shelf!'})
     return JsonResponse({'status': 'error', 'message': 'Invalid request.'})
-    
 # REREADING BOOK
 def re_read_book(request):
     if request.method == 'POST':

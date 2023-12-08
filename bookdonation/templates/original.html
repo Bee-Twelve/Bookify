@@ -1,0 +1,536 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<nav class="bg-gray-800">
+    <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+        <div class="relative flex h-16 items-center justify-between">
+            <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
+                <div class="flex flex-shrink-0 items-center">
+                    <h1 class="font-bold text-blue-500 text-2xl mt-0.5 mb-1 ml-0.5">B O O K I F Y</h1>
+                </div>
+                <div class="hidden sm:ml-6 sm:block">
+                    <div class="flex space-x-4">
+                        <a href="{% url 'homepage:show_homepage' %}" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Home</a>
+                    </div>
+                </div>
+            </div>
+            <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+                <button type="button" class="rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                    <span class="sr-only">View notifications</span>
+                </button>
+                <div class="relative ml-3">
+                    {% if not user.is_authenticated %}
+                    <div>
+                        <button class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium" onclick="location.href='/login/'">Login</button>
+                    </div>
+                    {% else %}
+                    <div class="flex space-x-4 items-center"> <!-- Added "items-center" class -->
+                        <p class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium">{{ user.get_username }}</p>
+                        <button class="text-gray-300 hover:bg-gray-700 hover-text-white px-3 py-2 rounded-md text-sm font-medium" onclick="location.href='/logout/'">Logout</button>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+
+
+   
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Donasi Buku Sendiri</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="form" onsubmit="return false;">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="judul_buku" class="col-form-label">Judul buku :</label>
+                            <input type="text" class="form-control" id="judul_buku" name="judul_buku"></input>
+                        </div>
+                        <div class="mb-3">
+                            <label for="total_buku" class="col-form-label">Total buku yang didonasikan :</label>
+                            <input type="number" class="form-control" id="total_buku" name="total_buku"></input>
+                        </div>
+                        <div class="mb-3">
+                            <label for="resi" class="col-form-label">Resi pengiriman :</label>
+                            <textarea class="form-control" id="resi" name="resi"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="resetInputFields()">Close</button>
+                    <button type="button" class="btn btn-primary" id="button_add" data-bs-dismiss="modal">Add Product</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+  
+
+    <div class="modal fade" id="exampleModalLibrary" tabindex="-1" aria-labelledby="exampleModalLabelLibrary" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabelLibrary">Donasi Buku dari Library</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        {% for book in books %}
+                        <div class="col-md-4 mb-4">
+                            <div class="card">
+                                <img src="{{ book.thumbnail }}" class="card-img-top" alt="a book">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ book.title }}</h5>
+                                    <p class="card-text">{{ book.published_year }}</p>
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#donasikan" onclick="prepareDonasikan('{{ book.title }}')">Donasikan</button>
+                                    
+                                </div>
+                              
+                            </div>
+                        </div>
+                    
+                        {% if forloop.counter|divisibleby:3 %}
+                        </div>
+                        <div class="row">
+                        {% endif %}
+                    
+                        {% endfor %}
+                    </div>
+                    
+    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" >Close</button>
+                    <!-- Tambahkan tombol atau fungsi untuk menangani donasi dari library di sini -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="donasikan" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Donasi Buku</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="form" onsubmit="return false;">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="total_buku_donasi" class="col-form-label">Total buku yang akan didonasikan :</label>
+                            <input type="number" class="form-control" id="total_buku_donasi" name="total_buku_donasi" oninput="updateDonationCount()"></input>
+                        </div>
+                    </form>
+                </div>
+                
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModalLibrary" onclick="resetInputFields()">Kembali</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="resetInputFields()">Tutup</button>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#donasikanQR">Donasikan</button>
+                    <input type="hidden" id="selected-book-title" value="">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="donasikanQR" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Donasi Buku</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center">
+                        <p>Berikut adalah QR untuk menyelesaikan pesanan Anda:</p>
+                        <p>T</p>
+                        <img src="https://img.freepik.com/premium-vector/unique-qr-code-isolated-white-back_251819-2203.jpg?w=740" alt="QR Code">
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="showBookAlert()">Donasikan sekarang</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    
+    
+    {% if user.role == 'member' %}
+    <div class="container mt-5">
+        <h3 class="text-center">Halo, {{ name }}</h3>
+        <div class="text-center">
+            <h5>Kamu sudah mendonasikan sebanyak <span id="jumlah_item_verif">{{ jumlah_item_verif }} buku</span></h5>
+            <h5>Buku donasi yang menunggu di verifikasi :  <span id="buku_tunggu">{{ buku_tunggu }} buku</span></h5>
+            <h5>Total poinmu sekarang ada: <span id="jumlah_poin">{{ jumlah_poin }} poin</span></h5>
+            
+        </div>
+
+    <table class="table table-bordered mt-4">
+        <thead>
+            <tr>
+                <th>Judul buku</th>
+                <th>Total buku</th>
+                <th>Resi</th>
+                <th>Edit</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+            <tr>
+                <td>{{ product.judul_buku }}</td>
+                <td>
+                    <span id="amount_{{ product.id }}">{{ product.total_buku }}</span>
+            
+                </td>
+                <td>{{ product.resi }}</td>
+                <td>
+                    <form method="post" action="{% url 'bookdonation:hapus_produk' product.id %}">
+                        {% csrf_token %}
+
+                        {% if product.status == "Sudah diverifikasi" %}
+                        <script>
+                            document.querySelector(".btn-hapus[data-product-id='{{ product.id }}']").style.display = "none";
+                        </script>
+                    {% endif %}
+                       
+                
+                <td>{{ product.status }}</td>
+                
+                    <form method="post" action="{% url 'bookdonation:hapus_produk' product.id %}">
+                        {% csrf_token %}
+                       
+                       
+                </td>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="text-center mt-4">
+       
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Donasikan buku sendiri
+        </button>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModalLibrary">Donasi buku dari library</button>
+    </div>
+    {% endif %}
+
+    {% if user.role == 'moderator' %}
+    <div class="container mt-5">
+        <h3 class="text-center">Halo, {{ name }}</h3>
+        <div class="text-center">
+            <h5>Ada sebanyak <span id="jumlah_item_tunggu">{{ jumlah_item_tunggu }} buku donasi yang perlu kamu cek untuk di verifikasi</span></h5>
+           
+            
+    </div>
+    <table class="table table-bordered mt-4">
+        <thead>
+            <tr>
+                <th>Judul buku</th>
+                <th>Total buku</th>
+                <th>Resi</th>
+                <th>Edit</th>
+                <th>Status</th>
+                <th>Verifikasi</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in semua_produk %}
+            <tr>
+                <td>{{ product.judul_buku }}</td>
+                <td>
+                    <span id="amount_{{ product.id }}">{{ product.total_buku }}</span>
+            
+                </td>
+                <td>{{ product.resi }}</td>
+                <td>
+                    <form method="post" action="{% url 'bookdonation:hapus_produk' product.id %}">
+                        {% csrf_token %}
+                       
+                        <button class="btn btn-danger btn-sm btn-hapus" data-product-id="{{ product.id }}">Hapus</button>
+                
+                <td>{{ product.status }}</td>
+                
+                <td>
+                    <a class="btn btn-success btn-sm btn-verifikasi" href="{% url 'bookdonation:ubah_status' product.id %}">Verifikasi</a>
+
+                </td>
+                
+                    <form method="post" action="{% url 'bookdonation:hapus_produk' product.id %}">
+                        {% csrf_token %}
+                       
+                       
+                </td>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="text-center mt-4">
+       
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Donasikan buku sendiri
+        </button>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModalLibrary">Donasi buku dari library</button>
+    </div>
+    {% endif %}
+
+
+
+
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const verifikasiButtons = document.querySelectorAll('.btn-verifikasi');
+
+        verifikasiButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const productId = this.getAttribute('data-product-id');
+                const action = `{% url 'bookdonation:ubah_status' 0 %}`.replace('0', productId);
+
+                // Kirim permintaan AJAX POST ke action
+                fetch(action, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                })
+                .then(response => {
+                    if (response.status === 200) {
+                        // Anda dapat menambahkan logika tambahan di sini jika diperlukan
+                        console.log('Status produk telah diubah');
+                    } else {
+                        console.error('Gagal mengubah status produk:', response.statusText);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            });
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const verifikasiButtons = document.querySelectorAll('.btn-verifikasi');
+    
+        verifikasiButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const productId = this.getAttribute('data-product-id');
+                const action = `/verifikasi_produk/${productId}/`; // Ganti dengan URL yang sesuai
+    
+                // Kirim permintaan AJAX untuk verifikasi produk
+                fetch(action, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}' // Gantilah ini dengan cara Anda mengambil CSRF token
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Handle success
+                        console.log('Produk berhasil diverifikasi.');
+    
+                        // Ganti status produk menjadi "verifikasi" di dalam tampilan
+                        const statusCell = button.parentNode.previousElementSibling;
+                        statusCell.textContent = 'verifikasi';
+    
+                        // Tambahkan kode di sini untuk melakukan tindakan lain jika diperlukan
+                    } else {
+                        // Handle error
+                        console.error('Gagal memverifikasi produk:', response.statusText);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            });
+        });
+    });
+    
+    
+
+    function resetInputFields() {
+        document.getElementById("judul_buku").value = "";
+        document.getElementById("total_buku").value = "";
+        document.getElementById("resi").value = "";
+        document.getElementById("total_buku_donasi").value = "";
+    }
+
+
+    let donationCount = 0; // Variable to store the book count
+    
+    function updateDonationCount() {
+        const totalBukuInput = document.getElementById("total_buku_donasi");
+        const donationCountParagraph = document.getElementById("donation-count");
+
+        donationCount = totalBukuInput.value; // Update the variable
+        donationCountParagraph.textContent = `Anda akan mendonasikan ${donationCount} buku.`;
+    }
+
+    function showBookAlert() {
+        const bookTitle = document.getElementById('selected-book-title').value;
+    
+        const donationCount = document.getElementById("total_buku_donasi").value;
+        const resi = "library"; // Set default value for resi
+
+    
+        alert(`Anda mendonasikan buku ${bookTitle} sebanyak ${donationCount} buku.`);
+        resetInputFields()
+        
+        // Create a FormData object and add the values to it
+        const formData = new FormData();
+        formData.append("judul_buku", bookTitle);
+        formData.append("total_buku", donationCount);
+        formData.append("resi", resi);
+    
+        // Send the data to the server via AJAX
+        fetch("{% url 'bookdonation:add_product_ajax' %}", {
+            method: "POST",
+            body: formData
+        }).then(response => {
+            if (response.ok) {
+                // Handle success
+                console.log('Product created successfully');
+                document.getElementById("total_buku_donasi").value = ""; // Clear the input field
+                donationCount = 0; // Reset the variable
+                location.reload(); // Refresh the page
+            } else {
+                // Handle error
+                console.error('Failed to create product');
+                location.reload();
+            }
+        });
+    }
+    
+
+   
+
+    function prepareDonasikan(bookTitle) {
+        document.getElementById('selected-book-title').value = bookTitle;
+    }
+
+    
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const hapusButtons = document.querySelectorAll('.btn-hapus');
+
+        hapusButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const productId = this.getAttribute('data-product-id');
+                const action = `{% url 'bookdonation:hapus_produk_ajax' 0 %}`.replace('0', productId);
+
+                // Kirim permintaan AJAX DELETE ke action
+                fetch(action, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                })
+                .then(response => {
+                    if (response.status === 204) {
+                        // Hapus baris produk dari tampilan
+                        const row = button.closest('tr');
+                        row.remove();
+
+                        // Alihkan pengguna ke halaman utama
+                        window.location.href = '{% url "bookdonation:show_donation" %}';  // Ganti dengan URL halaman utama yang sesuai
+                    } else {
+                        console.error('Gagal menghapus produk:', response.statusText);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            });
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const hapusButtons = document.querySelectorAll('.btn-hapus');
+
+        hapusButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const productId = this.getAttribute('data-product-id');
+                const action = `{% url 'bookdonation:hapus_produk' 0 %}`.replace('0', productId);
+
+                // Kirim permintaan AJAX DELETE ke action
+                fetch(action, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    }
+                })
+                .then(response => {
+                    if (response.status === 204) {
+                        // Hapus baris produk dari tampilan
+                        const row = button.closest('tr');
+                        row.remove();
+                    } else {
+                        console.error('Gagal menghapus produk:', response.statusText);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            });
+        });
+    });
+
+    async function getProducts() {
+        return fetch("{% url 'bookdonation:get_product_json' %}").then((res) => res.json())
+    }
+
+    function addProduct() {
+        fetch("{% url 'bookdonation:add_product_ajax' %}", {
+            method: "POST",
+            body: new FormData(document.querySelector('#form'))
+        }).then(refreshProducts)
+        location.reload();
+
+        document.getElementById("form").reset()
+        return false
+    }
+
+    document.getElementById("button_add").onclick = addProduct
+
+    async function refreshProducts() {
+        document.getElementById("product_table").innerHTML = ""
+        const products = await getProducts()
+        let htmlString = `<tr>
+            <th>judul_buku</th>
+            <th>total_buku</th>
+            <th>resi</th>
+        </tr>`
+        products.forEach((item) => {
+            htmlString += `\n<tr>
+            <td>${item.fields.judul_buku}</td>
+            <td>${item.fields.total_buku}</td>
+            <td>${item.fields.resi}</td>
+        </tr>` 
+        })
+        
+        document.getElementById("product_table").innerHTML = htmlString
+    }
+
+    refreshProducts()
+ 
+</script>
+{% endblock content %}

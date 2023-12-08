@@ -236,20 +236,24 @@
     $('[data-toggle="tab"]').on("shown.bs.tab", (event) => {
       if (event.target.textContent === "Favorites") load_favorites();
     });
-  });
 
-  // Event ketika tombol "Add to Favorite" pada modal buku ditampilkan
-  $("#favButton").click(function () {
-    const bookId = $(this).data("book-id");
-    addFavorite(bookId);
-    $("#bookDetailsModal").modal("hide");
-  });
+    // Event ketika tombol "Add to Favorite" pada modal buku ditampilkan
+    $("#bookDetailsModal").on("shown.bs.modal", function () {
+      $("#favButton").click(function () {
+        const bookId = $(this).data("book-id");
+        addFavorite(bookId);
+        $("#bookDetailsModal").modal("hide");
+      });
+    });
 
-  // Event ketika tombol "Remove from Favorite" pada modal buku favorit ditampilkan
-  $("#remfavButton").click(function () {
-    const bookId = $(this).data("book-id");
-    removeFavorite(bookId);
-    $("#favbookDetailsModal").modal("hide");
+    // Event ketika tombol "Remove from Favorite" pada modal buku favorit ditampilkan
+    $("#favbookDetailsModal").on("shown.bs.modal", function () {
+      $("#remfavButton").click(function () {
+        const bookId = $(this).data("book-id");
+        removeFavorite(bookId);
+        $("#favbookDetailsModal").modal("hide");
+      });
+    });
   });
 
   // Tangkap event submit form pencarian
@@ -296,7 +300,7 @@
             <div class="card item" data-book-id="${book.pk}">
               <img src="${book.fields.thumbnail}" class="card-img-top" alt="a book" />
               <div class="card-body">
-                <h5 class="card-title border-0" id="title">${book.fields.title}</h5>
+                <h5 class="card-title" id="title">${book.fields.title}</h5>
                 <p class="card-text" id="year">${book.fields.author}</p>
               </div>
             </div>
@@ -343,7 +347,7 @@
           <div class="card item" data-book-id="${book.pk}">
             <img src="${book.fields.thumbnail}" class="card-img-top" alt="a book" />
             <div class="card-body">
-              <h5 class="card-title border-0" id="title">${book.fields.title}</h5>
+              <h5 class="card-title" id="title">${book.fields.title}</h5>
               <p class="card-text" id="year">${book.fields.author}</p>
             </div>
           </div>
