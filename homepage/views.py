@@ -45,40 +45,19 @@ def register(request):
     return render(request, 'register.html', context)
 
 #Default Login Function
-# def login_user(request):
-#     if request.method == 'POST':
-#         username = request.POST.get('username')
-#         password = request.POST.get('password')
-#         user = authenticate(request, username=username, password=password)
-#         if user is not None:
-#             login(request, user)
-#             return redirect('homepage:show_homepage')
-#         else:
-#             messages.info(request, 'Sorry, incorrect username or password. Please try again.')
-#     context = {}
-#     return render(request, 'login.html', context)
 def login_user(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
-
-        # Check if the user exists
-        if not username or not password:
-            messages.info(request, 'Please enter both username and password.')
-            return render(request, 'login.html')
-
         user = authenticate(request, username=username, password=password)
-
-        # Check if the authentication was successful
-        if user is not None and (not username or not password):
+        if user is not None:
             login(request, user)
-            messages.success(request, 'Login successful!')
             return redirect('homepage:show_homepage')
         else:
-            messages.info(request, 'Incorrect username or password. Please try again.')
-            
-    return render(request, 'login.html')
-    
+            messages.info(request, 'Sorry, incorrect username or password. Please try again.')
+    context = {}
+    return render(request, 'login.html', context)
+
 #Default Logout Function
 def logout_user(request):
     logout(request)
