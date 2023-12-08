@@ -31,14 +31,14 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 
-
-
+@csrf_exempt
 def hapus_produk_ajax(request, product_id):
-    if request.method == 'DELETE':
+    try:
         product = get_object_or_404(data_donasi1, pk=product_id)
         product.delete()
-        return HttpResponse(status=204)  # Menyatakan penghapusan berhasil
-    return HttpResponse(status=400)  # Permintaan yang tidak valid
+        return JsonResponse({'message': 'Product deleted successfully'})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
 
 @csrf_exempt
 def add_product_ajax(request):
@@ -50,9 +50,9 @@ def add_product_ajax(request):
         user = request.user
 
         if judul_buku and total_buku:  # Pastikan name dan total_buku tidak kosong
-            new_product = data_donasi1(judul_buku=judul_buku, total_buku=total_buku, resi=resi, user=user, status="menunggu verifikasi")
+            new_product = data_donasi1(judul_buku=judul_buku, total_buku=total_buku, resi=resi, user=user, status="Menunggu verifikasi")
             new_product.save()
-            location.reload()
+
             return JsonResponse({'message': 'Product created successfully'})
             
         else:
@@ -61,7 +61,7 @@ def add_product_ajax(request):
     return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 def get_product_json(request):
-    product_item = data_donasi1.objects.all()
+    product_item = data_donasi1.objects.filter(user=request.user)
     return HttpResponse(serializers.serialize('json', product_item))
 
 def tambah_produk(request, product_id):
@@ -154,7 +154,7 @@ def show_donation(request):
 
 
     semua_produk = data_donasi1.objects.all()
-    item_tunggu = data_donasi1.objects.filter(status='menunggu verifikasi')
+    item_tunggu = data_donasi1.objects.filter(status='Menunggu verifikasi')
     jumlah_item_tunggu = sum(product.total_buku for product in item_tunggu)
 
 
