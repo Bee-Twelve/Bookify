@@ -7,8 +7,8 @@ import json
 
 @csrf_exempt
 def login(request):
-    username = request.POST.get['username']
-    password = request.POST.get['password']
+    username = request.POST['username']
+    password = request.POST['password']
     user = authenticate(username=username, password=password)
     if user is not None:
         if user.is_active:
