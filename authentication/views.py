@@ -2,6 +2,8 @@ from django.shortcuts import render
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from homepage.forms import CustomUserCreationForm
+import json
 
 @csrf_exempt
 def login(request):
@@ -46,3 +48,23 @@ def logout(request):
         "status": False,
         "message": "Logout gagal."
         }, status=401)
+
+@csrf_exempt
+def register(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+
+        # Create a form instance and populate it with data from the request
+        form = CustomUserCreationForm(data)
+
+        # Check whether the form is valid
+        if form.is_valid():
+            # If valid, save the new user
+            form.save()
+            return JsonResponse({'status': 'success'}, status=200)
+        else:
+            # If the form is invalid, return the error messages
+            return JsonResponse({'status': 'failed', 'errors': form.errors}, status=400)
+
+    else:
+        return JsonResponse({'status': 'error'}, status=401)
