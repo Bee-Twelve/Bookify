@@ -46,11 +46,10 @@ def add_product_ajax(request):
         judul_buku = request.POST.get("judul_buku")
         total_buku = request.POST.get("total_buku")
         resi = request.POST.get("resi")
-        status = request.POST.get("status")
         user = request.user
 
         if judul_buku and total_buku:  # Pastikan name dan total_buku tidak kosong
-            new_product = data_donasi1(judul_buku=judul_buku, total_buku=total_buku, resi=resi, user=user, status="Menunggu verifikasi")
+            new_product = data_donasi1(judul_buku=judul_buku, total_buku=total_buku, resi=resi, user=user, status="Menunggu verifikasi", coin_reedem = "0")
             new_product.save()
 
             return JsonResponse({'message': 'Product created successfully'})
@@ -150,7 +149,7 @@ def show_donation(request):
 
     products = data_donasi1.objects.filter(user=request.user)
     item_verif = data_donasi1.objects.filter(status='Sudah diverifikasi', user=request.user)
-   
+
 
 
     semua_produk = data_donasi1.objects.all()
@@ -162,7 +161,12 @@ def show_donation(request):
     jumlah_item_verif = sum(product.total_buku for product in item_verif)
     
     buku_tunggu = jumlah_item - jumlah_item_verif
-    jumlah_poin =jumlah_item_verif * 10
+    coin_reedem = products.first().coin_reedem if products.exists() else 0
+
+
+    jumlah_poin =jumlah_item_verif * 10 - coin_reedem
+    
+    
 
     jumlah_produk = products.count()
     last_login = request.COOKIES.get('last_login', 'Tidak ada informasi login sebelumnya')  # Menggunakan get untuk menghindari KeyError
@@ -180,6 +184,8 @@ def show_donation(request):
         'semua_produk' : semua_produk,
         'buku_tunggu': buku_tunggu,
         'jumlah_item_tunggu': jumlah_item_tunggu,
+        'coin_reedem' : coin_reedem,
+
     }
 
     return render(request, "main.html", context)

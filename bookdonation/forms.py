@@ -4,4 +4,4 @@ from .models import data_donasi1
 class ProductForm(ModelForm):
     class Meta:
         model = data_donasi1
-        fields = ["judul_buku", "total_buku", "resi", "status"]
+        fields = ["judul_buku", "total_buku", "resi", "status", "coin_reedem"]
