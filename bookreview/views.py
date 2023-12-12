@@ -175,4 +175,35 @@ def ajax_delete_review(request, review_id):
     if review.delete() :
         response_data = {'status': 'success', 'code': 200, 'message': "Review berhasil dihapus."}
     return JsonResponse(response_data)
-        
+
+def book_review_api(request, book_id):
+    book = get_object_or_404(Books, pk=book_id)
+    reviews = Review.objects.filter(book=book)
+
+    # Create a dictionary to represent the JSON response
+    response_data = {
+        'book': {
+            'title': book.title,
+            'author': book.author,
+            'genre': book.genre,
+            'pages': book.pages,
+            'published_year': book.published_year,
+            'description': book.description,
+            'thumbnail': book.thumbnail,
+            'ratings_avg': book.ratings_avg,
+            'ratings_count': book.ratings_count,
+            'isbn10': book.isbn10,
+            'isbn13': book.isbn13,
+        },
+        'reviews': [
+            {
+                'user': review.user.username,
+                'comment': review.comment,
+                'rating': review.rating,
+            }
+            for review in reviews
+        ],
+    }
+
+    # Return the JsonResponse
+    return JsonResponse(response_data)
