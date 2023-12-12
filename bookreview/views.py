@@ -8,6 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db.models import F, Func
 from books.models import Books
 from django.db.models import Q
+import json
 
 # Create your views here.
 def book_review(request, book_id):
