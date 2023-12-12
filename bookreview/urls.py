@@ -15,4 +15,6 @@ urlpatterns = [
     path('add-favorite/<int:book_id>/', views.add_favorite_ajax, name='add_favorite'),
     path('remove-favorite/<int:book_id>/', views.remove_favorite_ajax, name='remove_favorite'),
     path('book/load-books-json/<int:book_id>/', views.book_review_api, name='load_books_json'),
+    path('load-books-all/', views.load_books_all, name='load_books_all'),
+    path('book/<int:book_id>/add_review_api/', views.add_review_api, name='add_review_api'),
 ]
