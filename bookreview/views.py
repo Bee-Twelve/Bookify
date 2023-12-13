@@ -198,7 +198,7 @@ def book_review_api(request, book_id):
         },
         'reviews': [
             {
-                'user': review.user,
+                'user': review.user.username,
                 'comment': review.comment,
                 'rating': review.rating,
             }
@@ -235,10 +235,11 @@ def add_review_api(request, book_id):
     response_data = {}
     
     book = get_object_or_404(Books, pk=book_id)
-        
+    user = request.POST.get('user')    
+
     if not user:
         response_data = {'status': 'error', 'code': 401, 'message': 'Anda harus login untuk menambahkan review'}
-    elif Review.objects.filter(book=book, user=request.POST.get('user')).exists():
+    elif Review.objects.filter(book=book, user=user).exists():
         response_data = {'status': 'error', 'code': 400, 'message': 'Anda sudah mereview buku ini'}
     else:
         if request.method == 'POST':
@@ -282,7 +283,7 @@ def add_review_api(request, book_id):
 @csrf_exempt
 def load_favorites_books_api(request):
     response_data = {}
-    
+    user = request.POST.get('user')    
     if not user:
         response_data = {'status': 'error', 'code': 401, 'message': 'Anda harus login untuk melihat daftar buku favorit'}
     else:
@@ -302,7 +303,8 @@ def load_favorites_books_api(request):
 @csrf_exempt
 def add_favorite_api(request, book_id):
     response_data = {}
-    
+    user = request.POST.get('user')    
+
     if not user:
         response_data = {'status': 'error', 'message': 'Anda harus login untuk menambahkan buku ke favorit.'}
     else:
@@ -330,6 +332,7 @@ def add_favorite_api(request, book_id):
 @csrf_exempt
 def remove_favorite_api(request, book_id):
     response_data = {}
+    user = request.POST.get('user')    
     
     if not user:
         response_data = {'status': 'error', 'message': 'Anda harus login untuk menghapus buku dari favorit.'}
