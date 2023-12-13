@@ -125,11 +125,9 @@ def ajax_add_review(request, book_id):
     book = Books.objects.get(isbn13=book_id)
     
     if Review.objects.filter(book=book, user=request.user).exists():
-        print("tes")
         response_data = {'status': 'error', 'code': 400, 'message': 'Anda sudah mereview buku ini'}
     else:
         if request.method == 'POST':
-            print("halo")
             rating = request.POST.get('book_rating')
             comment = request.POST.get('book_review')
             user = request.user
@@ -210,85 +208,52 @@ def book_review_api(request, book_id):
     return JsonResponse(response_data)
 
 
-# def add_review_api(request, book_id):
-#     response_data = {}
-
-#     book = Books.objects.get(pk=book_id)
-
-#     if Review.objects.filter(book=book, user=request.user).exists():
-#         response_data = {'status': 'error', 'code': 400, 'message': 'Anda sudah mereview buku ini'}
-#         print("tes")
-#     else:
-#         if request.method == 'POST':
-#             rating = int(request.POST.get('book_rating'))
-#             comment = request.POST.get('book_review')
-#             user = request.user
-#             review = Review(book=book, user=user, rating=rating, comment=comment)
-#             review.save()
-
-#             # Memanggil fungsi update_book_ratings untuk mengupdate ratings_count dan ratings_avg
-#             update_book_ratings(book, rating, action='add')
-
-#             # Create a dictionary
-#             response_data = {
-#                 'book': {
-#                     'title': book.title,
-#                     'author': book.author,
-#                     'genre': book.genre,
-#                     'pages': book.pages,
-#                     'published_year': book.published_year,
-#                     'description': book.description,
-#                     'thumbnail': book.thumbnail,
-#                     'ratings_avg': book.ratings_avg,
-#                     'ratings_count': book.ratings_count,
-#                     'isbn10': book.isbn10,
-#                     'isbn13': book.isbn13,
-#                 },
-#                 'review': {
-#                     'user': user.username,
-#                     'comment': comment,
-#                     'rating': rating,
-#                 },
-#                 'status': 'success',
-#                 'code': 200,
-#                 'message': 'Review berhasil ditambahkan.',
-#             }
-
-#             print("halo")
-
-#     return JsonResponse(response_data)
-
 @csrf_exempt
-@login_required
 def add_review_api(request, book_id):
     response_data = {}
-    # Get the book object based on the book_id
+    
     book = get_object_or_404(Books, pk=book_id)
-    # Check if the user has already reviewed the book
-    if Review.objects.filter(book=book, user=request.user).exists():
+    
+    if request.user.is_anonymous:
+        response_data = {'status': 'error', 'code': 401, 'message': 'Anda harus login untuk menambahkan review'}
+    elif Review.objects.filter(book=book, user=request.user).exists():
         response_data = {'status': 'error', 'code': 400, 'message': 'Anda sudah mereview buku ini'}
     else:
         if request.method == 'POST':
-            data = json.loads(request.body)
-
-            rating = int(data['book_rating'])
-            comment = data.get['book_review']
-
-            review = Review.objects.create(book=book, user=request.user, rating=rating, comment=comment)
-
+            rating = request.POST.get('book_rating')
+            comment = request.POST.get('book_review')
+            user = request.user
+            review = Review(book=book, user=user, rating=rating, comment=comment)
+            review.save()
+            
+            # Memanggil fungsi update_book_ratings untuk mengupdate ratings_count dan ratings_avg
             update_book_ratings(book, rating, action='add')
-
+                
+            # Construct the JSON response similar to book_review_api
             response_data = {
-                'review': {
-                    'user': request.user.username,
-                    'comment': comment,
-                    'rating': rating,
-                },
                 'status': 'success',
                 'code': 200,
-                'message': 'Review berhasil ditambahkan.',
+                'message': "Review berhasil ditambahkan.",
+                'book': {
+                    'title': book.title,
+                    'author': book.author,
+                    'genre': book.genre,
+                    'pages': book.pages,
+                    'published_year': book.published_year,
+                    'description': book.description,
+                    'thumbnail': book.thumbnail,
+                    'ratings_avg': book.ratings_avg,
+                    'ratings_count': book.ratings_count,
+                    'isbn10': book.isbn10,
+                    'isbn13': book.isbn13,
+                },
+                'review': {
+                    'user': user.username,
+                    'comment': comment,
+                    'rating': rating,
+                }
             }
-
+    
     return JsonResponse(response_data)
 
 @csrf_exempt
@@ -310,3 +275,77 @@ def load_books_all(request):
 
     # Jika metode permintaan tidak valid
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
+
+
+@csrf_exempt
+def load_favorites_books_api(request):
+    response_data = {}
+
+    if request.user.is_anonymous:
+        response_data = {'status': 'error', 'code': 401, 'message': 'Anda harus login untuk melihat daftar buku favorit'}
+    else:
+        # Mendapatkan daftar buku favorit dari pengguna yang sedang login
+        favorites = Favorite.objects.filter(user=request.user)
+    
+        favorite_books = [favorite.book for favorite in favorites]
+        
+        # Serialisasi data buku ke dalam format JSON
+        serialized_favorites = serializers.serialize('json', favorite_books)
+
+        # Assign serialized data to the response_data dictionary
+        response_data = {'status': 'success', 'code': 200, 'message': 'Daftar buku favorit berhasil dimuat', 'data': serialized_favorites}
+
+    return HttpResponse(response_data, content_type="application/json")
+
+@csrf_exempt
+def add_favorite_api(request, book_id):
+    response_data = {}
+
+    if request.user.is_anonymous:
+        response_data = {'status': 'error', 'message': 'Anda harus login untuk menambahkan buku ke favorit.'}
+    else:
+        try:
+            book = get_object_or_404(Books, pk=book_id)
+            # Check if the book is already in the user's favorites
+            existing_favorite = Favorite.objects.filter(user=request.user, book=book).exists()
+            if not existing_favorite:
+                # If the book is not in favorites, add it to the user's favorites
+                favorite = Favorite(user=request.user, book=book)
+                favorite.save()
+                response_data = {'status': 'success', 'message': 'Buku berhasil ditambahkan ke favorit.'}
+            else:
+                response_data = {'status': 'error', 'message': 'Buku sudah ada dalam favorit.'}
+        except Books.DoesNotExist:
+            response_data = {'status': 'error', 'message': 'Buku tidak ditemukan.'}
+
+    # Serialize the response data to JSON
+    serialized_data = json.dumps(response_data)
+    
+    # Return the serialized data as a JSON response
+    return HttpResponse(serialized_data, content_type="application/json")
+
+
+@csrf_exempt
+def remove_favorite_api(request, book_id):
+    response_data = {}
+
+    if request.user.is_anonymous:
+        response_data = {'status': 'error', 'message': 'Anda harus login untuk menghapus buku dari favorit.'}
+    else:
+        try:
+            book = get_object_or_404(Books, pk=book_id)
+            # Remove the book from the user's favorites if it exists
+            favorite = Favorite.objects.filter(user=request.user, book=book).first()
+            if favorite:
+                favorite.delete()
+                response_data = {'status': 'success', 'message': 'Buku berhasil dihapus dari favorit.'}
+            else:
+                response_data = {'status': 'error', 'message': 'Buku tidak ada dalam favorit.'}
+        except Books.DoesNotExist:
+            response_data = {'status': 'error', 'message': 'Buku tidak ditemukan.'}
+
+    # Serialize the response data to JSON
+    serialized_data = json.dumps(response_data)
+
+    # Return the serialized data as a JSON response
+    return HttpResponse(serialized_data, content_type="application/json")
