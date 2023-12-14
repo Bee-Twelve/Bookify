@@ -269,7 +269,7 @@ def add_review_api(request, book_id):
         if request.method == 'GET':
             print("3")
             data = json.loads(request.body)
-            # print(data)
+            print(data)
             review = Review.objects.create(
                 book = book,
                 rating = int(data['book_rating']),
