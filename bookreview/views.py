@@ -232,61 +232,61 @@ def load_books_all(request):
 
 
 
-@csrf_exempt
-def add_review_api(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        print(data)
-
-        new_review = Review.objects.create(
-            user = User.objects.get(username=data["username"]),
-            review = Books.objects.get(pk = data["id"]),
-            rating = int(data["book_rating"]),
-            comment = data["book_review"],
-        )
-
-        new_review.save()
-
-        return JsonResponse({"status": "success"}, status=201)
-    else:
-        return JsonResponse({"status": "Not Found"}, status=404)
-
-
 # @csrf_exempt
-# def add_review_api(request, book_id):
-#     response_data = {}
-    
-#     book = get_object_or_404(Books, pk=book_id)
-#     user = request.user
-#     print(user)
-#     if not user:
-#         print("1")
-#         response_data = {'status': 'error', 'code': 401, 'message': 'Anda harus login untuk menambahkan review'}
-#     elif Review.objects.filter(book=book, user=request.user).exists():
-#         print("2")
-#         response_data = {'status': 'error', 'code': 400, 'message': 'Anda sudah mereview buku ini'}
+# def add_review_api(request):
+#     if request.method == 'POST':
+#         data = json.loads(request.body)
+#         print(data)
+
+#         new_review = Review.objects.create(
+#             user = User.objects.get(username=data["username"]),
+#             review = Books.objects.get(pk = data["id"]),
+#             rating = int(data["book_rating"]),
+#             comment = data["book_review"],
+#         )
+
+#         new_review.save()
+
+#         return JsonResponse({"status": "success"}, status=201)
 #     else:
-#         if request.method == 'GET':
-#             print("3")
-#             data = json.loads(request.body)
-#             # print(data)
-#             review = Review.objects.create(
-#                 book = book,
-#                 rating = int(data['book_rating']),
-#                 comment = data['book_review'],
-#                 user = User.objects.get(username=data["username"]),
-#                 review = Review(book=book, user=user, rating=rating, comment=comment)
-#             )
-#             review.save()
-#             update_book_ratings(book, rating, action='add')
+#         return JsonResponse({"status": "Not Found"}, status=404)
 
-#             response_data = {'status': 'success', 'code': 200, 'message': "Review berhasil ditambahkan."}
 
-#         else:
-#             print("4")
-#             return JsonResponse({"status": "Not Found"}, status=404)
-#     print("5")
-#     return JsonResponse(response_data)
+@csrf_exempt
+def add_review_api(request, book_id):
+    response_data = {}
+    
+    book = get_object_or_404(Books, pk=book_id)
+    user = request.user
+    print(user)
+    if not user:
+        print("1")
+        response_data = {'status': 'error', 'code': 401, 'message': 'Anda harus login untuk menambahkan review'}
+    elif Review.objects.filter(book=book, user=request.user).exists():
+        print("2")
+        response_data = {'status': 'error', 'code': 400, 'message': 'Anda sudah mereview buku ini'}
+    else:
+        if request.method == 'GET':
+            print("3")
+            data = json.loads(request.body)
+            # print(data)
+            review = Review.objects.create(
+                book = book,
+                rating = int(data['book_rating']),
+                comment = data['book_review'],
+                user = User.objects.get(username=data["username"]),
+                review = Review(book=book, user=user, rating=rating, comment=comment)
+            )
+            review.save()
+            update_book_ratings(book, rating, action='add')
+
+            response_data = {'status': 'success', 'code': 200, 'message': "Review berhasil ditambahkan."}
+
+        else:
+            print("4")
+            return JsonResponse({"status": "Not Found"}, status=404)
+    print("5")
+    return JsonResponse(response_data)
 
 
 @csrf_exempt
