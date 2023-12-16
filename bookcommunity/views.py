@@ -207,3 +207,27 @@ def create_discussion_flutter(request):
 
     # Return an error response for non-POST requests
     return JsonResponse({"status": "error", "message": "Invalid request"}, status=400)
+
+@csrf_exempt
+def delete_forum_flutter(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({"status": "error", "message": "User not logged in"}, status=401)
+
+    if request.method == 'DELETE':
+        data = json.loads(request.body)
+        forum_id = data.get("forum_id")
+
+        try:
+            forum = Forum.objects.get(pk=forum_id)
+
+            # Check if the requesting user is the owner or a moderator
+            if forum.user != request.user and not request.user.role in ["moderator", "Moderator"]:
+                return JsonResponse({"status": "error", "message": "Unauthorized"}, status=403)
+
+            forum.delete()
+            return JsonResponse({"status": "success", "message": "Forum deleted"}, status=200)
+
+        except Forum.DoesNotExist:
+            return JsonResponse({"status": "error", "message": "Forum not found"}, status=404)
+
+    return JsonResponse({"status": "error", "message": "Invalid request"}, status=400)
