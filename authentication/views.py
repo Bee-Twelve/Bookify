@@ -4,14 +4,16 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from homepage.forms import CustomUserCreationForm
 import json
+from django.contrib.auth.decorators import login_required
 
 @csrf_exempt
 def login(request):
-    username = request.POST['username']
-    password = request.POST['password']
-    user = authenticate(username=username, password=password)
-    if user is not None:
-        if user.is_active:
+    username = request.POST.get('username')
+    password = request.POST.get('password')
+
+    if username is not None and password is not None:
+        user = authenticate(username=username, password=password)
+        if user is not None and user.is_authenticated:
             auth_login(request, user)
             # Status login sukses.
             return JsonResponse({
@@ -23,14 +25,14 @@ def login(request):
         else:
             return JsonResponse({
                 "status": False,
-                "message": "Login gagal, akun dinonaktifkan."
+                "message": "Login gagal, periksa kembali email atau kata sandi."
             }, status=401)
-
     else:
         return JsonResponse({
             "status": False,
-            "message": "Login gagal, periksa kembali email atau kata sandi."
-        }, status=401)
+            "message": "Username or password not provided in the request."
+        }, status=400)
+
 
 @csrf_exempt
 def logout(request):
