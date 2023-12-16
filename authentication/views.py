@@ -68,3 +68,9 @@ def register(request):
 
     else:
         return JsonResponse({'status': 'error'}, status=401)
+
+def check_is_anonymous(request):
+  print(request.user.is_anonymous)
+  return JsonResponse({
+      "anonymous": request.user.is_anonymous
+  }, status=200)

@@ -14,5 +14,6 @@ urlpatterns = [
     path('show_json_discussion/', show_json_discussion, name='show_json_discussion'),
     path('create_forum_flutter/', create_forum_flutter, name='create_forum_flutter'),
     path('create_discussion_flutter/', create_discussion_flutter, name='create_discussion_flutter'),
+    path('delete_forum_flutter/', delete_forum_flutter, name='delete_forum_flutter'),
     
 ]
