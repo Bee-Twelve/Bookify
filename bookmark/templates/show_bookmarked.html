@@ -248,49 +248,30 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <input type="text" class="form-control" id="searchBar" placeholder="Search for a book...">
 
-<div class="filter-form">
-  <form method="get" action="{% url 'bookmark:show_bookmark' %}">
-      <label for="genre">Filter by Genre:</label>
-      <select name="genre" id="genre">
-          <option value="">All Genres</option>
-          <option value="Fiction">Fiction</option>
-          <option value="Juvenile Fiction">Juvenile Fiction</option>
-          <option value="Biography & Autobiography">Biography & Autobiography</option>   
-          <option value="History">History</option>
-          <option value="Literacy Criticism">Literacy Criticism</option>
-          <option value="Philosophy">Philosophy</option>
-          <option value="Religion">Religion</option>
-          <option value="Comics & Graphic Novels">Comics & Graphic Novels</option>   
-          <option value="Drama">Drama</option>
-          <option value="Juvenile Nonfiction">Juvenile Nonfiction</option>     
-      </select>
 
-      <button type="submit">Apply Filters</button>
-  </form>
-</div>
 
 <div class="container">
     {% for book in bookmarks %}
       <a href="#" class="card-link"
-      data-book-id="{{ book.book.book.id }}" 
-      data-title="{{ book.book.book.title }}"
-      data-author="{{ book.book.book.author }}"
-      data-year="{{ book.book.book.published_year }}"
-      data-genre="{{ book.book.book.genre }}"
-      data-pages="{{ book.book.book.pages }}"
-      data-description="{{ book.book.book.description }}"
-      data-thumbnail="{{ book.book.book.thumbnail }}"
-      data-ratings_avg="{{ book.book.book.ratings_avg }}"
-      data-ratings_count="{{ book.book.book.ratings_count }}"
-      data-isbn10="{{ book.book.book.isbn10 }}" 
-      data-isbn13="{{ book.book.book.isbn13 }}" 
+      data-book-id="{{ book.book.id }}" 
+      data-title="{{ book.book.title }}"
+      data-author="{{ book.book.author }}"
+      data-year="{{ book.book.published_year }}"
+      data-genre="{{ book.book.genre }}"
+      data-pages="{{ book.book.pages }}"
+      data-description="{{ book.book.description }}"
+      data-thumbnail="{{ book.book.thumbnail }}"
+      data-ratings_avg="{{ book.book.ratings_avg }}"
+      data-ratings_count="{{ book.book.ratings_count }}"
+      data-isbn10="{{ book.book.isbn10 }}" 
+      data-isbn13="{{ book.book.isbn13 }}" 
       data-source="library">
 
       <div class="card item" data-book-id="{{ book.id }}">
-          <img src="{{ book.book.book.thumbnail }}" class="card-img-top" alt="a book">
+          <img src="{{ book.book.thumbnail }}" class="card-img-top" alt="a book">
           <div class="card-body">
-              <h5 class="card-title" id="title">{{ book.book.book.title }}</h5>
-              <p class="card-text">{{ book.book.book.author }}</p>
+              <h5 class="card-title" id="title">{{ book.book.title }}</h5>
+              <p class="card-text">{{ book.book.author }}</p>
           </div>
           <a href="{% url 'bookmark:delete_bookmark' book.id %}">
             <button class="delete-button" id="deleteButtons">Delete</button>

@@ -15,8 +15,7 @@ from books.models import Books
 def show_bookmark(request):
     genre = request.GET.get('genre')
     user = request.user
-    bookmarks = UserBook.objects.filter(user=user)
-
+    bookmarks = Books.objects.all()
     if genre:
         bookmarks = bookmarks.filter(book__genre__icontains=genre)
         
@@ -32,7 +31,7 @@ def show_bookmark(request):
 
 @login_required
 def add_bookmark(request, book_id):
-    book = get_object_or_404(UserBook, id=book_id)
+    book = Books.objects.get(pk=book_id)
     user = request.user
     if not Bookmark.objects.filter(user=user, book=book).exists():
         bookmark = Bookmark(user=user, book=book)

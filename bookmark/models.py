@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.conf import settings
 from booklibrary.models import UserBook
+from books.models import Books
 
 #-------------------------------------IMPORTANT!---------------------------------------------------
 # ALWAYS USE 'settings.AUTH_USER_MODEL' INSTEAD OF THE USUAL 'User' WHEN CONNECTING MODELS TO USER!
@@ -17,5 +18,4 @@ from booklibrary.models import UserBook
 
 class Bookmark(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    book = models.ForeignKey(UserBook, on_delete=models.CASCADE, null=True)
-
+    book = models.ForeignKey(Books, on_delete=models.CASCADE)  # Diubah dari UserBook ke Books
