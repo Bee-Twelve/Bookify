@@ -20,4 +20,6 @@ urlpatterns = [
     path('book/<int:book_id>/add_review_api/', views.add_review_api, name='add_review_api'),
     path('remove-favorite-api/<int:book_id>/', views.remove_favorite_api, name='remove_favorite_api'),
     path('add-favorite-api/<int:book_id>/', views.add_favorite_api, name='add_favorite_api'),
+    path('book/api_update_review/<int:review_id>', views.api_update_review, name='api_update_review'),
+
 ]
