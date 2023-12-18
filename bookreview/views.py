@@ -289,25 +289,45 @@ def add_review_api(request, book_id):
     return JsonResponse(response_data)
 
 
+@login_required(login_url='/login/')
 @csrf_exempt
 def load_favorites_books_api(request):
-    response_data = {}
-    user = request.POST.get('user')    
-    if not user:
+    if request.user.is_authenticated == False:
         response_data = {'status': 'error', 'code': 401, 'message': 'Anda harus login untuk melihat daftar buku favorit'}
+        return JsonResponse(response_data, content_type="application/json")
     else:
         # Mendapatkan daftar buku favorit dari pengguna yang sedang login
-        favorites = Favorite.objects.filter(user = request.POST.get('user'))
-    
-        favorite_books = [favorite.book for favorite in favorites]
+        favorites = Favorite.objects.filter(user=request.user)
         
-        # Serialisasi data buku ke dalam format JSON
-        serialized_favorites = serializers.serialize('json', favorite_books)
+        favorite_books = [
+            {
+                "pk": favorite.book.pk,
+                "fields": {
+                    "title": favorite.book.title,
+                    "author": favorite.book.author,
+                    "genre": favorite.book.genre,
+                    "pages": favorite.book.pages,
+                    "published_year": favorite.book.published_year,
+                    "description": favorite.book.description,
+                    "thumbnail": favorite.book.thumbnail,
+                    "ratings_avg": favorite.book.ratings_avg,
+                    "ratings_count": favorite.book.ratings_count,
+                    "isbn10": favorite.book.isbn10,
+                    "isbn13": favorite.book.isbn13,
+                }
+            }
+            for favorite in favorites
+        ]
+        
+        # bagian response data
+        response_data = {
+            'status': 'success', 
+            'code': 200, 
+            'message': 'Daftar buku favorit berhasil dimuat', 
+            'data': favorite_books
+        }
+        return JsonResponse(response_data, content_type="application/json")
 
-        # Assign serialized data to the response_data dictionary
-        response_data = {'status': 'success', 'code': 200, 'message': 'Daftar buku favorit berhasil dimuat', 'data': serialized_favorites}
-
-    return HttpResponse(response_data, content_type="application/json")
 
 @csrf_exempt
 def add_favorite_api(request, book_id):
