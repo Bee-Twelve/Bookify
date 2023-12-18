@@ -28,5 +28,5 @@ urlpatterns = [
     path('bookdonation/', include('bookdonation.urls')),
     path('bookmark/', include('bookmark.urls')),
     path('api/books/', include('books.urls')),
-    path('auth/', include('authentication.urls')), 
+    path('authentication/', include('authentication.urls')), 
 ]
