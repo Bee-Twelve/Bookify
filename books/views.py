@@ -15,3 +15,13 @@ def fetch_book(request):
     if request.method == 'GET':
         data = Books.objects.all().order_by('pk')
     return HttpResponse(serializers.serialize("json", data), content_type="application/json")
+
+def search_books(request):
+    query = request.GET.get('q', '')
+    if (query == ''):
+        data = Books.objects.all().order_by('pk')
+        return HttpResponse(serializers.serialize("json", data), content_type="application/json")
+    else:
+        data = Books.objects.filter(
+            title__contains=query).order_by('pk') | Books.objects.filter(author__contains=query).order_by('pk') | Books.objects.filter(genre__contains=query).order_by('pk')
+    return HttpResponse(serializers.serialize("json", data), content_type="application/json")
