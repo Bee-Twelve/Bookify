@@ -409,3 +409,22 @@ def api_update_review(request, review_id):
             response_data = {'status': 'success', 'code': 200, 'message': "Review berhasil diedit."}
 
     return JsonResponse(response_data, content_type="application/json")
+
+
+@login_required(login_url='/login/')
+@require_POST
+@csrf_exempt
+def api_delete_review(request, review_id):
+    response_data = {}
+    review = get_object_or_404(Review, pk=review_id, user=request.user)
+
+    if request.user.is_authenticated == False:
+        response_data = {'status': 'error', 'code': 401, 'message': 'Anda harus login untuk delete review buku Anda.'}
+        return JsonResponse(response_data, content_type="application/json")
+    else: 
+        # Memanggil fungsi update_book_ratings untuk mengupdate ratings_count dan ratings_avg
+        update_book_ratings(review.book, review.rating, action='delete')
+        
+        if review.delete() :
+            response_data = {'status': 'success', 'code': 200, 'message': "Review berhasil dihapus."}
+    return JsonResponse(response_data, content_type="application/json")
