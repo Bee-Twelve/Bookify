@@ -235,7 +235,7 @@ def load_books_all(request):
 @csrf_exempt
 def add_review_api(request, book_id):
     response_data = {'status': 'success', 'code': 123, 'message': "haha oke"}
-    book = Books.objects.get(isbn13=book_id)
+    book = Books.objects.get(pk=book_id)
     if request.user.is_authenticated == False:
         response_data = {'status': 'error', 'code': 401, 'message': 'Anda harus login untuk menambahkan buku ke favorit.'}
         return JsonResponse(response_data, content_type="application/json")
