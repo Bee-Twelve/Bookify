@@ -84,4 +84,3 @@ def show_bookmarked(request):
     }
 
     return render(request, 'show_bookmarked.html', context)
-
