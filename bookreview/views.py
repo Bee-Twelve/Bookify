@@ -230,83 +230,118 @@ def load_books_all(request):
     return JsonResponse({'status': 'error', 'message': 'Invalid request method.'})
 
 
+
+@login_required(login_url='/login/')
 @csrf_exempt
 def add_review_api(request, book_id):
-    response_data = {}
-    
-    book = get_object_or_404(Books, pk=book_id)
-    user = request.POST.get('user')    
-
-    if not user:
-        response_data = {'status': 'error', 'code': 401, 'message': 'Anda harus login untuk menambahkan review'}
-    elif Review.objects.filter(book=book, user=user).exists():
-        response_data = {'status': 'error', 'code': 400, 'message': 'Anda sudah mereview buku ini'}
+    response_data = {'status': 'success', 'code': 123, 'message': "haha oke"}
+    book = Books.objects.get(pk=book_id)
+    if request.user.is_authenticated == False:
+        response_data = {'status': 'error', 'code': 401, 'message': 'Anda harus login untuk menambahkan buku ke favorit.'}
+        return JsonResponse(response_data, content_type="application/json")
     else:
-        if request.method == 'POST':
-            rating = request.POST.get('book_rating')
-            comment = request.POST.get('book_review')
-            user = request.POST.get('user')    
-            review = Review(book=book, user=user, rating=rating, comment=comment)
-            review.save()
-            
-            # Memanggil fungsi update_book_ratings untuk mengupdate ratings_count dan ratings_avg
-            update_book_ratings(book, rating, action='add')
+        if Review.objects.filter(book=book, user=request.user).exists():
+            response_data = {'status': 'error', 'code': 400, 'message': 'Anda sudah mereview buku ini'}
+        else:
+            if request.method == 'POST':
+                rating = request.POST.get('book_rating')
+                print(f"rating: {rating}, tipe: {type(rating)}")
+                comment = request.POST.get('book_review')
+                print(f"comment: {comment}, tipe: {type(comment)}")
+                user = request.user
+                review = Review(book=book, user=user, rating=rating, comment=comment)
+                review.save()
                 
-            # Construct the JSON response similar to book_review_api
-            response_data = {
-                'status': 'success',
-                'code': 200,
-                'message': "Review berhasil ditambahkan.",
-                'book': {
-                    'title': book.title,
-                    'author': book.author,
-                    'genre': book.genre,
-                    'pages': book.pages,
-                    'published_year': book.published_year,
-                    'description': book.description,
-                    'thumbnail': book.thumbnail,
-                    'ratings_avg': book.ratings_avg,
-                    'ratings_count': book.ratings_count,
-                    'isbn10': book.isbn10,
-                    'isbn13': book.isbn13,
-                },
-                'review': {
-                    'user': user,
-                    'comment': comment,
-                    'rating': rating,
-                }
-            }
-    
-    return JsonResponse(response_data)
+                # Memanggil fungsi update_book_ratings untuk mengupdate ratings_count dan ratings_avg
+                update_book_ratings(book, rating, action='add')
+                    
+                response_data = {'status': 'success', 'code': 200, 'message': "Review berhasil ditambahkan."}
+        
+        return JsonResponse(response_data, content_type = "application/json")
 
 
+
+# @login_required(login_url='/login/')
+# @csrf_exempt
+# def add_review_api(request, book_id):
+#     response_data = {}
+
+#     if request.user.is_authenticated == False:
+#         response_data = {'status': 'error', 'code': 401, 'message': 'Anda harus login untuk menambahkan review.'}
+#         return JsonResponse(response_data, content_type="application/json")
+#     else: 
+#         book = get_object_or_404(Books, pk=book_id)
+#         user = request.user
+#         if Review.objects.filter(book=book, user=request.user).exists():
+#             response_data = {'status': 'error', 'code': 400, 'message': 'Anda sudah mereview buku ini'}
+#         else:
+#             if request.method == 'POST':
+#                 data = json.loads(request.body)
+#                 print(data)
+#                 review = Review.objects.create(
+#                     book = book,
+#                     rating = int(data['book_rating']),
+#                     comment = data['book_review'],
+#                     user = User.objects.get(username=data["username"]),
+#                     review = Review(book=book, user=user, rating=rating, comment=comment)
+#                 )
+#                 review.save()
+#                 update_book_ratings(book, rating, action='add')
+
+#                 response_data = {'status': 'success', 'code': 200, 'message': "Review berhasil ditambahkan."}
+
+#             else:
+#                 return JsonResponse({"status": "Not Found"}, status=404)
+#     return JsonResponse(response_data, content_type="application/json")
+
+
+@login_required(login_url='/login/')
 @csrf_exempt
 def load_favorites_books_api(request):
-    response_data = {}
-    user = request.POST.get('user')    
-    if not user:
+    if request.user.is_authenticated == False:
         response_data = {'status': 'error', 'code': 401, 'message': 'Anda harus login untuk melihat daftar buku favorit'}
+        return JsonResponse(response_data, content_type="application/json")
     else:
         # Mendapatkan daftar buku favorit dari pengguna yang sedang login
-        favorites = Favorite.objects.filter(user = request.POST.get('user'))
-    
-        favorite_books = [favorite.book for favorite in favorites]
+        favorites = Favorite.objects.filter(user=request.user)
         
-        # Serialisasi data buku ke dalam format JSON
-        serialized_favorites = serializers.serialize('json', favorite_books)
+        favorite_books = [
+            {
+                "pk": favorite.book.pk,
+                "fields": {
+                    "title": favorite.book.title,
+                    "author": favorite.book.author,
+                    "genre": favorite.book.genre,
+                    "pages": favorite.book.pages,
+                    "published_year": favorite.book.published_year,
+                    "description": favorite.book.description,
+                    "thumbnail": favorite.book.thumbnail,
+                    "ratings_avg": favorite.book.ratings_avg,
+                    "ratings_count": favorite.book.ratings_count,
+                    "isbn10": favorite.book.isbn10,
+                    "isbn13": favorite.book.isbn13,
+                }
+            }
+            for favorite in favorites
+        ]
+        
+        # bagian response data
+        response_data = {
+            'status': 'success', 
+            'code': 200, 
+            'message': 'Daftar buku favorit berhasil dimuat', 
+            'data': favorite_books
+        }
+        return JsonResponse(response_data, content_type="application/json")
 
-        # Assign serialized data to the response_data dictionary
-        response_data = {'status': 'success', 'code': 200, 'message': 'Daftar buku favorit berhasil dimuat', 'data': serialized_favorites}
-
-    return HttpResponse(response_data, content_type="application/json")
 
 @csrf_exempt
 def add_favorite_api(request, book_id):
     response_data = {}
-    user = request.POST.get('user')    
-
-    if not user:
-        response_data = {'status': 'error', 'message': 'Anda harus login untuk menambahkan buku ke favorit.'}
+    
+    if request.user.is_authenticated == False:
+        response_data = {'status': 'error', 'code': 401, 'message': 'Anda harus login untuk menambahkan buku ke favorit.'}
+        return JsonResponse(response_data, content_type="application/json")
     else:
         try:
             book = get_object_or_404(Books, pk=book_id)
@@ -314,7 +349,7 @@ def add_favorite_api(request, book_id):
             existing_favorite = Favorite.objects.filter(user=request.POST.get('user'), book=book).exists()
             if not existing_favorite:
                 # If the book is not in favorites, add it to the user's favorites
-                favorite = Favorite(user=request.POST.get('user'), book=book)
+                favorite = Favorite(user=request.user, book=book)
                 favorite.save()
                 response_data = {'status': 'success', 'message': 'Buku berhasil ditambahkan ke favorit.'}
             else:
@@ -322,25 +357,22 @@ def add_favorite_api(request, book_id):
         except Books.DoesNotExist:
             response_data = {'status': 'error', 'message': 'Buku tidak ditemukan.'}
 
-    # Serialize the response data to JSON
-    serialized_data = json.dumps(response_data)
-    
     # Return the serialized data as a JSON response
-    return HttpResponse(serialized_data, content_type="application/json")
+    return JsonResponse(response_data, content_type="application/json")
 
 
 @csrf_exempt
 def remove_favorite_api(request, book_id):
     response_data = {}
-    user = request.POST.get('user')    
-    
-    if not user:
+
+    if request.user.is_authenticated == False:
         response_data = {'status': 'error', 'message': 'Anda harus login untuk menghapus buku dari favorit.'}
+        return JsonResponse(response_data, content_type="application/json")
     else:
         try:
             book = get_object_or_404(Books, pk=book_id)
             # Remove the book from the user's favorites if it exists
-            favorite = Favorite.objects.filter(user=request.POST.get('user'), book=book).first()
+            favorite = Favorite.objects.filter(user=request.user, book=book).first()
             if favorite:
                 favorite.delete()
                 response_data = {'status': 'success', 'message': 'Buku berhasil dihapus dari favorit.'}
@@ -349,8 +381,50 @@ def remove_favorite_api(request, book_id):
         except Books.DoesNotExist:
             response_data = {'status': 'error', 'message': 'Buku tidak ditemukan.'}
 
-    # Serialize the response data to JSON
-    serialized_data = json.dumps(response_data)
-
     # Return the serialized data as a JSON response
-    return HttpResponse(serialized_data, content_type="application/json")
+    return JsonResponse(response_data, content_type="application/json")
+
+
+@login_required(login_url='/login/')
+@csrf_exempt
+def api_update_review(request, review_id):
+    response_data = {}
+
+    if request.user.is_authenticated == False:
+        response_data = {'status': 'error', 'code': 401, 'message': 'Anda harus login untuk update review buku Anda.'}
+        return JsonResponse(response_data, content_type="application/json")
+    else:
+        review = get_object_or_404(Review, pk=review_id, user=request.user)
+        
+        if request.method == 'POST':
+            rating = request.POST.get('book_rating')
+            comment = request.POST.get('book_review')
+            
+            # Memanggil fungsi update_book_ratings untuk mengupdate ratings_count dan ratings_avg
+            update_book_ratings(review.book, rating, review.rating, action='update')
+            
+            review.rating = rating
+            review.comment = comment
+            review.save()
+            response_data = {'status': 'success', 'code': 200, 'message': "Review berhasil diedit."}
+
+    return JsonResponse(response_data, content_type="application/json")
+
+
+@login_required(login_url='/login/')
+@require_POST
+@csrf_exempt
+def api_delete_review(request, review_id):
+    response_data = {}
+    review = get_object_or_404(Review, pk=review_id, user=request.user)
+
+    if request.user.is_authenticated == False:
+        response_data = {'status': 'error', 'code': 401, 'message': 'Anda harus login untuk delete review buku Anda.'}
+        return JsonResponse(response_data, content_type="application/json")
+    else: 
+        # Memanggil fungsi update_book_ratings untuk mengupdate ratings_count dan ratings_avg
+        update_book_ratings(review.book, review.rating, action='delete')
+        
+        if review.delete() :
+            response_data = {'status': 'success', 'code': 200, 'message': "Review berhasil dihapus."}
+    return JsonResponse(response_data, content_type="application/json")
