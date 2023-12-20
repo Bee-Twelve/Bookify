@@ -97,6 +97,7 @@
         <h5 style="color: white;">Kamu sudah mendonasikan sebanyak <span id="jumlah_item_verif" style="color: white;">{{ jumlah_item_verif }} buku</span></h5>
         <h5 style="color: white;">Buku donasi yang menunggu di verifikasi: <span id="buku_tunggu" style="color: white;">{{ buku_tunggu }} buku</span></h5>
         <h5 style="color: white;">Total poinmu sekarang ada: <span id="jumlah_poin" style="color: white;">{{ jumlah_poin }} poin</span></h5>
+        <h5 style="color: white;">Total poinmu yang sudah di reedem <span id="coin_reedem" style="color: white;">{{ coin_reedem }} poin</span></h5>
     </div>
 </div>
 
@@ -257,19 +258,18 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="changePoinForm" onsubmit="submitChangePoin()">
+                <form id="changePoinForm" onsubmit="return submitChangePoin()">
                     {% csrf_token %}
                     <div class="mb-3">
-                        <label for="total_poin_redemption" class="col-form-label">Total Points untuk ditukar( 1 poin = Rp1 ) :</label>
+                        <label for="total_poin_redemption" class="col-form-label">Total Points untuk ditukar (1 poin = Rp1):</label>
                         <input type="number" class="form-control" id="total_poin_redemption" name="total_poin_redemption" oninput="updateRedemptionCount()">
                     </div>
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="submit" class="btn btn-primary">Tukarkan</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
-
 
 
     <div class="container mt-5 text-center">
@@ -280,8 +280,9 @@
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModalLibrary">Donasi buku dari library</button>
             <script>
                 // Check the condition and add the button dynamically
-                if ({{ jumlah_poin }} >= 50) {
-                    document.write('<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#changePoinModal">Change Poin</button>');
+                if ({{ jumlah_poin }} >= 20000
+                ) {
+                    document.write(' <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#changePoinModal">Change Poin</button>');
                 }
             </script>
         </li>
@@ -292,6 +293,72 @@
 
     <!-- Tambahkan script JavaScript di sini -->
     <script>
+         document.getElementById("changePoinForm").addEventListener("submit", function (event) {
+            event.preventDefault(); // Mencegah formulir untuk melakukan submit
+    
+            // Mendapatkan nilai total poin dari input
+            var totalPoin = document.getElementById("total_poin_redemption").value;
+
+            // Memanggil fungsi resetInputFields untuk mereset input field
+            resetInputFields2();
+    
+            // Melakukan refresh halaman web
+            location.reload();
+        }); 
+
+        function submitChangePoin() {
+            // Get the total_poin_redemption value from the input field
+            var totalPoinRedemption = document.getElementById('total_poin_redemption').value;
+        
+            // Make an AJAX request to the change_poin URL with the total_poin_redemption value
+              // Check if total_poin_redemption is less than 20000
+              if (parseInt(totalPoinRedemption) < 20000) {
+                alert('Minimal redeem poin adalah 20000');
+                return false; // Prevent the form submission
+              }
+          else{var xhr = new XMLHttpRequest();
+            xhr.open('POST', '{% url "bookdonation:change_poin" %}', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.setRequestHeader('X-CSRFToken', document.getElementsByName('csrfmiddlewaretoken')[0].value);
+                // Memanggil fungsi resetInputFields untuk mereset input field
+                resetInputFields2();
+    
+                // Melakukan refresh halaman web
+                location.reload();
+        
+            // Set up the callback function to handle the response
+            xhr.onreadystatechange = function () {
+              if (xhr.readyState === 4 && xhr.status === 200) {
+                // Handle the success response, for example, show a success message
+                alert('Points redeemed successfully');
+                // You can also close the modal or perform other actions here
+              } else if (xhr.readyState === 4 && xhr.status !== 200) {
+                // Handle the error response, for example, show an error message
+                alert('Error redeeming points');
+              }
+            };
+        
+            // Send the POST request with the total_poin_redemption value
+            xhr.send('total_poin_redemption=' + encodeURIComponent(totalPoinRedemption));}  
+            
+        
+            // Prevent the form from submitting the traditional way
+            return false;
+          }
+        
+    
+        // Fungsi untuk mereset input field
+        function resetInputFields2() {
+            document.getElementById("total_poin_redemption").value = "";
+            // Tambahkan pernyataan reset lainnya sesuai kebutuhan Anda
+        }
+    
+        // Fungsi untuk memperbarui perhitungan penukaran (opsional)
+        function updateRedemptionCount() {
+            // Lakukan sesuatu berdasarkan perubahan pada input total poin jika diperlukan
+        }
+
+ 
         function resetInputFields() {
             document.getElementById("judul_buku").value = "";
             document.getElementById("total_buku").value = "";

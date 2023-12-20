@@ -6,6 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponseRedirect
 from .forms import ProductForm
 from django.urls import reverse
+from .models import Poin
 
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
@@ -18,6 +19,9 @@ import datetime
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponseNotFound
 from books.models import Books 
+from django.http import JsonResponse
+
+
 
 
 
@@ -49,7 +53,7 @@ def add_product_ajax(request):
         user = request.user
 
         if judul_buku and total_buku:  # Pastikan name dan total_buku tidak kosong
-            new_product = data_donasi1(judul_buku=judul_buku, total_buku=total_buku, resi=resi, user=user, status="Menunggu verifikasi", coin_reedem = "0")
+            new_product = data_donasi1(judul_buku=judul_buku, total_buku=total_buku, resi=resi, user=user, status="Menunggu verifikasi")
             new_product.save()
 
             return JsonResponse({'message': 'Product created successfully'})
@@ -111,6 +115,29 @@ def ubah_status(request, product_id):
     except data_donasi1.DoesNotExist:
         # Handle jika produk tidak ditemukan
         return JsonResponse({'error': 'Produk tidak ditemukan'}, status=404)
+    
+
+
+def change_poin(request):
+    if request.method == 'POST':
+        total_poin_redemption = request.POST.get('total_poin_redemption')
+
+        # Assuming the user is logged in, get the user's Poin object
+        user_poin, created = Poin.objects.get_or_create(user=request.user)
+
+        # Update the coin_reedem field
+        
+        user_poin.coin_reedem += int(total_poin_redemption)
+        user_poin.save()
+
+        # Print the total_poin_redemption to the console (optional)
+        print("Total Poin Redemption:", total_poin_redemption)
+
+        return JsonResponse({'success': 'Points redeemed successfully'})
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+
 
 
 def hapus_produk(request, product_id):
@@ -161,7 +188,10 @@ def show_donation(request):
     jumlah_item_verif = sum(product.total_buku for product in item_verif)
     
     buku_tunggu = jumlah_item - jumlah_item_verif
-    coin_reedem = products.first().coin_reedem if products.exists() else 0
+    user_poin, created = Poin.objects.get_or_create(user=request.user)
+
+    # Accessing coin_reedem
+    coin_reedem = user_poin.coin_reedem
 
 
     jumlah_poin =jumlah_item_verif * 10 - coin_reedem

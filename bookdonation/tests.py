@@ -14,7 +14,6 @@ class MyViewsTest(TestCase):
             total_buku=5,
             resi="12345",
             status="menunggu verifikasi",
-            coin_reedem = 0;
             user=self.user,
         )
 

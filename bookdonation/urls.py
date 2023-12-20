@@ -12,6 +12,7 @@ urlpatterns = [
     path('xml/<int:id>/', show_xml_by_id, name='show_xml_by_id'),
     path('json/<int:id>/', show_json_by_id, name='show_json_by_id'), 
     path('ubah_status/<int:product_id>/', ubah_status, name='ubah_status'),
+    path('change_poin/', change_poin, name='change_poin'),
     path('hapus_produk/<int:product_id>/', hapus_produk, name='hapus_produk'),
     path('tambah_produk/<int:product_id>/', tambah_produk, name='tambah_produk'),
     path('kurang_produk/<int:product_id>/', kurang_produk, name='kurang_produk'),

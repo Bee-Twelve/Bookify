@@ -21,6 +21,9 @@ class data_donasi1(models.Model):
     total_buku = models.IntegerField()
     resi = models.TextField()
     status = models.CharField(max_length=255)
-    coin_reedem = models.IntegerField()
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    
+
+
+class Poin(models.Model):
+    coin_reedem = models.IntegerField(default=0)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
