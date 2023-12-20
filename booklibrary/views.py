@@ -1,6 +1,7 @@
+from datetime import timezone
 import json
 from django.core import serializers
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.shortcuts import redirect
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -85,6 +86,7 @@ def borrow_book(request):
     return JsonResponse({'status': 'error', 'message': 'Invalid request.'})
 
 # COMPLETE READING
+@csrf_exempt
 def complete_reading(request):
     if request.method == 'POST':
         user = request.user
@@ -102,6 +104,7 @@ def complete_reading(request):
             return JsonResponse({'status': 'error', 'message': 'Book is not in your shelf!'})
     return JsonResponse({'status': 'error', 'message': 'Invalid request.'})
 # REREADING BOOK
+@csrf_exempt
 def re_read_book(request):
     if request.method == 'POST':
         user = request.user
@@ -142,6 +145,8 @@ def add_to_bookshelf(request):
 
         # If the book was added to the bookshelf (i.e., it didn't exist before)
         if created:
+            user_book.status = 'reading'
+            user_book.save()
             return JsonResponse({'status': 'success', 'message': 'Book added to your bookshelf.'})
         else:
             return JsonResponse({'status': 'error', 'message': 'Book is already on your bookshelf.'})
@@ -183,6 +188,46 @@ def show_bookshelf(request):
         status=405
     )
 
+@login_required
+@csrf_exempt
+def search_user_books(request):
+    user = request.user
+    query = request.GET.get('q', '')
+
+    if not user.is_authenticated:
+        return HttpResponse(
+            json.dumps({'status': 'error', 'message': 'User not authenticated'}),
+            content_type="application/json", status=401
+        )
+
+    if query == '':
+        user_books = UserBook.objects.filter(user=user)
+    else:
+        user_books = UserBook.objects.filter(
+            Q(book__title__icontains=query) | 
+            Q(book__author__icontains=query) | 
+            Q(book__genre__iexact=query),
+            user=user
+        )
+
+    books_data = [{
+        'id': user_book.book.id,
+        'title': user_book.book.title,
+        'author': user_book.book.author,
+        'published_year': user_book.book.published_year,
+        'genre': user_book.book.genre,
+        'pages': user_book.book.pages,
+        'description': user_book.book.description,
+        'thumbnail': user_book.book.thumbnail,
+        'ratings_avg': user_book.book.ratings_avg,
+        'ratings_count': user_book.book.ratings_count,
+        'isbn10': user_book.book.isbn10,
+        'isbn13': user_book.book.isbn13,
+        'status': user_book.get_status_display(),
+    } for user_book in user_books]
+
+    return HttpResponse(json.dumps(books_data), content_type="application/json")
+
 def show_userbook(request):
     user_books = UserBook.objects.all()  # Adjust the query as needed
 
@@ -203,3 +248,22 @@ def show_userbook(request):
     } for book in user_books]
     
     return JsonResponse(data, safe=False)
+
+@csrf_exempt
+def update_reading_status(request, book_id):
+    user = request.user
+    if not user.is_authenticated:
+        return JsonResponse({'status': 'error', 'message': 'User not authenticated'}, status=401)
+
+    if request.method == 'POST':
+        # Fetch the UserBook instance
+        user_book = get_object_or_404(UserBook, user=user, book_id=book_id)
+
+        # Update the status and end_date
+        user_book.status = 'completed'
+        user_book.end_date = timezone.now().date()
+        user_book.save()
+
+        return JsonResponse({'status': 'success', 'message': 'Reading status updated to completed.'})
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method.'}, status=400)

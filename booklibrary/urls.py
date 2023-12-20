@@ -13,5 +13,6 @@ urlpatterns = [
     path('re-read-book/', re_read_book, name='re_read_book'),
     path('add-to-bookshelf/', add_to_bookshelf, name='add_to_bookshelf'),
     path('show-bookshelf/', show_bookshelf, name='show_bookshelf'),
+    path('search-user-books/', search_user_books, name='search_user_books'),
     path('show-userbook/', show_userbook, name='show_userbook'),
 ]
