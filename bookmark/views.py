@@ -10,6 +10,8 @@ from django.urls import reverse
 from booklibrary.models import UserBook
 from django.contrib import messages
 from books.models import Books
+import json
+
 
 @login_required(login_url='/login')
 def show_bookmark(request):
@@ -32,15 +34,27 @@ def show_bookmark(request):
 
 @csrf_exempt
 def add_bookmark(request, book_id):
-    book = Books.objects.get(pk=book_id)
-    user = request.user
-    if not Bookmark.objects.filter(user=user, book=book).exists():
-        bookmark = Bookmark(user=user, book=book)
-        bookmark.save()
-    #     messages.success(request, f'"{book.book.title}" telah ditambahkan ke bookmark Anda.')
-    # else:
-    #     messages.warning(request, f'"{book.book.title}" sudah ada di bookmark Anda.')  
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+    if request.method == 'POST':
+        # Decode the request body to get the JSON data
+        data = json.loads(request.body)
+
+        # Extract the relevant information
+        forum_id = data.get("forum_id")
+
+        try:
+            book = Books.objects.get(id=forum_id)
+            user = request.user
+
+            if not Bookmark.objects.filter(user=user, book=book).exists():
+                bookmark = Bookmark(user=user, book=book)
+                bookmark.save()
+                return JsonResponse({"status": "success", "message": f'"{book.title}" telah ditambahkan ke bookmark Anda.'})
+            else:
+                return JsonResponse({"status": "error", "message": f'"{book.title}" sudah ada di bookmark Anda.'}, status=400)
+        except Books.DoesNotExist:
+            return JsonResponse({"status": "error", "message": "Buku tidak ditemukan."}, status=404)
+    else:
+        return JsonResponse({"status": "error", "message": "Metode tidak diizinkan"}, status=405)
 
 
 @csrf_exempt
