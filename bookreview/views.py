@@ -176,6 +176,7 @@ def ajax_delete_review(request, review_id):
         response_data = {'status': 'success', 'code': 200, 'message': "Review berhasil dihapus."}
     return JsonResponse(response_data)
 
+@login_required
 @csrf_exempt
 def book_review_api(request, book_id):
     book = get_object_or_404(Books, pk=book_id)
@@ -211,6 +212,7 @@ def book_review_api(request, book_id):
 
 
 
+@login_required
 @csrf_exempt
 def load_books_all(request):
     if request.method == 'POST':
@@ -235,6 +237,7 @@ def load_books_all(request):
 
 
 
+@login_required
 @csrf_exempt
 def add_review_api(request, book_id):
     if request.method != 'POST':
@@ -260,6 +263,7 @@ def add_review_api(request, book_id):
     except (KeyError, TypeError, ValueError):
         return JsonResponse({'status': 'error', 'code': 400, 'message': 'Invalid data provided.'})
 
+@login_required
 @csrf_exempt
 def update_review_api(request, book_id):
     if request.method != 'POST':
@@ -284,6 +288,7 @@ def update_review_api(request, book_id):
     except (KeyError, TypeError, ValueError):
         return JsonResponse({'status': 'error', 'code': 400, 'message': 'Invalid data provided.'})
 
+@login_required
 @csrf_exempt
 def delete_review_api(request, book_id):
     user = request.user
@@ -298,7 +303,7 @@ def delete_review_api(request, book_id):
     except Review.DoesNotExist:
         return JsonResponse({'status': 'error', 'code': 404, 'message': 'Review not found'})
 
-# @login_required(login_url='/login/')
+@login_required
 @csrf_exempt
 def load_favorites_books_api(request):
     if not request.user.is_authenticated:
@@ -341,6 +346,7 @@ def load_favorites_books_api(request):
 
 
 
+@login_required
 @csrf_exempt
 def add_favorite_api(request, book_id):
     user = request.user
@@ -363,7 +369,7 @@ def add_favorite_api(request, book_id):
     except Books.DoesNotExist:
         return JsonResponse({'status': 'error', 'message': 'Buku tidak ditemukan.'})
 
-
+@login_required
 @csrf_exempt
 def remove_favorite_api(request, book_id):
     user = request.user
