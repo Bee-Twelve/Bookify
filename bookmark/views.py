@@ -29,7 +29,8 @@ def show_bookmark(request):
     return render(request, 'show_bookmark.html', context)
 
 
-@login_required
+
+@csrf_exempt
 def add_bookmark(request, book_id):
     book = Books.objects.get(pk=book_id)
     user = request.user
@@ -40,6 +41,7 @@ def add_bookmark(request, book_id):
     # else:
     #     messages.warning(request, f'"{book.book.title}" sudah ada di bookmark Anda.')  
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
 
 @csrf_exempt
 def delete_bookmark(request, book_id):
@@ -53,7 +55,7 @@ def show_json(request):
     return HttpResponse(serializers.serialize("json", data), content_type="application/json")
 
 
-@login_required
+
 def show_bookmarked(request):
     genre = request.GET.get('genre')
     user = request.user
