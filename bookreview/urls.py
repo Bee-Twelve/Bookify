@@ -18,6 +18,8 @@ urlpatterns = [
     path('load-books-all/', views.load_books_all, name='load_books_all'),
     path('load-favorites-api/', views.load_favorites_books_api, name='load_favorites_api'),
     path('book/<int:book_id>/add_review_api/', views.add_review_api, name='add_review_api'),
+    path('book/<int:book_id>/update_review_api/', views.update_review_api, name='update_review_api'),
+    path('book/<int:book_id>/delete_review_api/', views.delete_review_api, name='delete_review_api'),
     path('remove-favorite-api/<int:book_id>/', views.remove_favorite_api, name='remove_favorite_api'),
     path('add-favorite-api/<int:book_id>/', views.add_favorite_api, name='add_favorite_api'),
 ]

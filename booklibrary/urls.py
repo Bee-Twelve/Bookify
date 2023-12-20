@@ -11,4 +11,7 @@ urlpatterns = [
     path('borrow-book/', borrow_book, name='borrow_book'),
     path('complete-reading/', complete_reading, name='complete_reading'),
     path('re-read-book/', re_read_book, name='re_read_book'),
+    path('add-to-bookshelf/', add_to_bookshelf, name='add_to_bookshelf'),
+    path('show-bookshelf/', show_bookshelf, name='show_bookshelf'),
+    path('show-userbook/', show_userbook, name='show_userbook'),
 ]

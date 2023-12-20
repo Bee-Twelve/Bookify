@@ -76,3 +76,23 @@ def check_is_anonymous(request):
   return JsonResponse({
       "anonymous": request.user.is_anonymous
   }, status=200)
+
+def get_user_data(request):
+    user = request.user
+
+    if (not request.user.is_anonymous):
+        return JsonResponse({
+            "username": user.username,
+            "email": user.email,
+            "role": user.role,
+            "full_name": user.full_name,
+            "address": user.address,
+            "phone_number": user.phone_number,
+            "birthplace": user.birthplace,
+            "birthdate": user.birthdate,
+        }, status=200)
+    else:
+        return JsonResponse({
+            "status": False,
+            "message": "User not found."
+        }, status=401)
