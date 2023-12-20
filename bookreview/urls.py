@@ -22,4 +22,7 @@ urlpatterns = [
     path('book/<int:book_id>/delete_review_api/', views.delete_review_api, name='delete_review_api'),
     path('remove-favorite-api/<int:book_id>/', views.remove_favorite_api, name='remove_favorite_api'),
     path('add-favorite-api/<int:book_id>/', views.add_favorite_api, name='add_favorite_api'),
+    path('book/api_update_review/<int:review_id>', views.api_update_review, name='api_update_review'),
+    path('book/api_delete_review/<int:review_id>', views.api_delete_review, name='api_delete_review'),
+
 ]
