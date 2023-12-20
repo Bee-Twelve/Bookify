@@ -228,6 +228,8 @@ def search_user_books(request):
 
     return HttpResponse(json.dumps(books_data), content_type="application/json")
 
+@login_required
+@csrf_exempt
 def show_userbook(request):
     user_books = UserBook.objects.all()  # Adjust the query as needed
 
@@ -249,6 +251,7 @@ def show_userbook(request):
     
     return JsonResponse(data, safe=False)
 
+@login_required
 @csrf_exempt
 def update_reading_status(request, book_id):
     user = request.user
