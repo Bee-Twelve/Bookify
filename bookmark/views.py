@@ -41,7 +41,7 @@ def add_bookmark(request, book_id):
     #     messages.warning(request, f'"{book.book.title}" sudah ada di bookmark Anda.')  
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
-@login_required
+@csrf_exempt
 def delete_bookmark(request, book_id):
     bookmark = get_object_or_404(Bookmark, id=book_id)
     bookmark.delete()
@@ -68,3 +68,4 @@ def show_bookmarked(request):
     }
 
     return render(request, 'show_bookmarked.html', context)
+

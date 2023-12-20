@@ -8,7 +8,6 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('bookmark', '0002_initial'),
-        ('books', '0002_auto_20231031_0034'),
     ]
 
     operations = [
